@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     trackedIssues = DEFAULT_ISSUES;
   }
 
-  function renderIssuesList() {
+  function renderIssuesDOM() {
     issuesListEl.innerHTML = '';
     issueCountEl.textContent = trackedIssues.length;
 
@@ -165,6 +165,29 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       issuesListEl.appendChild(item);
     });
+  }
+
+  function renderIssuesList() {
+    renderIssuesDOM();
+    // Fetch issues.json from server
+    fetch('/issues.json')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          // Merge server issues with any local write-ins
+          const localRaw = localStorage.getItem('orbital_merge_issues');
+          let localIssues = [];
+          if (localRaw) {
+            try { localIssues = JSON.parse(localRaw); } catch(e) {}
+          }
+          // Combine by ID
+          const existingIds = new Set(data.map(i => i.id));
+          const customIssues = localIssues.filter(i => !existingIds.has(i.id));
+          trackedIssues = [...customIssues, ...data];
+          renderIssuesDOM();
+        }
+      })
+      .catch(() => {});
   }
 
   function escapeHtml(str) {
@@ -428,12 +451,20 @@ document.addEventListener('DOMContentLoaded', () => {
       desc: desc
     };
 
-    trackedIssues.unshift(newIssue);
-    try {
-      localStorage.setItem('orbital_merge_issues', JSON.stringify(trackedIssues));
-    } catch (err) {}
+    // Post to server to sync with repository and FEATURE_TRACKER.md
+    fetch('/api/issues', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newIssue)
+    }).then(res => res.json())
+      .then(data => {
+        if (data && data.issue) {
+          renderIssuesList();
+        }
+      })
+      .catch(() => {});
 
-    renderIssuesList();
+    renderIssuesDOM();
     newIssueForm.reset();
     audio.playBuy();
     alert(`Issue #${newIssue.id} "${title}" logged successfully! The AI assistant can now review and resolve it.`);
