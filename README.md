@@ -17,9 +17,9 @@ Inspired by circular track idle merge games and fully customizable across the **
    *(Base Gate Multiplier starts at **2x** and scales by powers of 2: **2x, 4x, 8x, 16x, 32x, 64x**)*.
 2. **Buy & Scale**: Expand your fleet and gate network starting with 1-coin economy:
    $$\text{New Cost} = \text{Base Cost} \times 1.15^{\text{Owned Amount}}$$
-3. **Merge & Upgrade**:
-   - **Merge Ships**: Combine two identical ships into Tier $N+1$ via the **MERGE SHIPS** button or canvas drag-and-drop.
-   - **Merge Gates**: Combine two identical gates into Tier $N+1$ with double the multiplier via the **MERGE GATES** button at the bottom.
+3. **Merge & Upgrade**: Merging requires an investment of currency that scales with the tier of the entities being combined:
+   - **Merge Ships**: Combine two identical ships into Tier $N+1$ via the **MERGE SHIPS** button or canvas drag-and-drop. Merge cost scales exponentially: $\text{Cost} = \text{round}(2 \times 2.2^{T-1})$ coins (Tier 1: 2 coins, Tier 2: 4 coins, Tier 3: 10 coins).
+   - **Merge Gates**: Combine two identical gates into Tier $N+1$ with double the multiplier via the **MERGE GATES** button. Merge cost scales exponentially: $\text{Cost} = \text{round}(10 \times 2.5^{T-1})$ coins (Tier 1: 10 coins, Tier 2: 25 coins, Tier 3: 63 coins).
 4. **Mission Goals**: Progressive milestone missions with dynamic progress bars and instant cash bounties.
 
 ---

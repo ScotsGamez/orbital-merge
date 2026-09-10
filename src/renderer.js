@@ -803,10 +803,33 @@
       }
     }
 
+    addFloatingText(text, x, y, color = '#ffd700', scale = 1.2) {
+      this.floatingTexts.push({
+        text: text,
+        x: x,
+        y: y,
+        vy: -35,
+        alpha: 1.0,
+        scale: scale,
+        color: color
+      });
+    }
+
     handlePointerUp(e) {
       if (this.draggedShip) {
         if (this.hoverTargetShip) {
-          this.game.mergeShips(this.draggedShip, this.hoverTargetShip);
+          const cost = this.game.getShipMergeCost(this.draggedShip.tier);
+          if (this.game.coins >= cost) {
+            const merged = this.game.mergeShips(this.draggedShip, this.hoverTargetShip);
+            if (merged) {
+              this.addFloatingText(`-${cost} ${this.game.theme.currencySymbol}`, this.dragPos.x, this.dragPos.y - 20, '#ffd700');
+            }
+          } else {
+            this.addFloatingText(`Need ${cost} ${this.game.theme.currencySymbol}!`, this.dragPos.x, this.dragPos.y - 20, '#ff4d4d', 1.3);
+            if (window.OrbitalAudio && window.OrbitalAudio.playClick) {
+              window.OrbitalAudio.playClick();
+            }
+          }
         }
         this.draggedShip = null;
         this.game.draggedShip = null;

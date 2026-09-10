@@ -258,13 +258,28 @@
       return pairs;
     }
 
+    getShipMergeCost(tier = 1) {
+      return Math.round(2 * Math.pow(2.2, tier - 1));
+    }
+
+    canMergeShips(tier = null) {
+      const pair = this.findMergeableShipPair();
+      if (!pair) return false;
+      const targetTier = tier !== null ? tier : pair[0].tier;
+      return this.coins >= this.getShipMergeCost(targetTier);
+    }
+
     mergeShips(shipA, shipB) {
       if (shipA.id === shipB.id || shipA.tier !== shipB.tier) return false;
+
+      const cost = this.getShipMergeCost(shipA.tier);
+      if (this.coins < cost) return false;
 
       const idxA = this.ships.findIndex(s => s.id === shipA.id);
       const idxB = this.ships.findIndex(s => s.id === shipB.id);
       if (idxA === -1 || idxB === -1) return false;
 
+      this.coins -= cost;
       const newTier = shipA.tier + 1;
       const targetAngle = shipB.angle;
 
@@ -288,6 +303,7 @@
 
       this.checkGoalProgress();
       this.emit('onEntityChange');
+      this.emit('onCoinUpdate');
       this.save();
       return mergedShip;
     }
@@ -333,13 +349,28 @@
       return pairs;
     }
 
+    getGateMergeCost(tier = 1) {
+      return Math.round(10 * Math.pow(2.5, tier - 1));
+    }
+
+    canMergeGates(tier = null) {
+      const pair = this.findMergeableGatePair();
+      if (!pair) return false;
+      const targetTier = tier !== null ? tier : pair[0].tier;
+      return this.coins >= this.getGateMergeCost(targetTier);
+    }
+
     mergeGates(gateA, gateB) {
       if (gateA.id === gateB.id || gateA.tier !== gateB.tier) return false;
+
+      const cost = this.getGateMergeCost(gateA.tier);
+      if (this.coins < cost) return false;
 
       const idxA = this.gates.findIndex(g => g.id === gateA.id);
       const idxB = this.gates.findIndex(g => g.id === gateB.id);
       if (idxA === -1 || idxB === -1) return false;
 
+      this.coins -= cost;
       const newTier = gateA.tier + 1;
 
       this.gates = this.gates.filter(g => g.id !== gateA.id);
@@ -359,6 +390,7 @@
 
       this.checkGoalProgress();
       this.emit('onEntityChange');
+      this.emit('onCoinUpdate');
       this.save();
       return survivingGate;
     }

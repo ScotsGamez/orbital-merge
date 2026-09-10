@@ -103,14 +103,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Merge Ships Button
     const mergePairs = game.getAvailableMergePairsCount();
     const totalShips = game.ships.length;
+    const nextShipPair = game.findMergeableShipPair();
+    const shipMergeCost = nextShipPair ? game.getShipMergeCost(nextShipPair[0].tier) : 0;
+    const canAffordShipMerge = game.coins >= shipMergeCost;
 
     if (mergePairs > 0) {
-      btnMergeShips.disabled = false;
-      btnMergeShips.classList.add('ready');
-      mergeStatusEl.textContent = `${mergePairs} Ready`;
+      mergeStatusEl.textContent = `${mergePairs} Ready • ${game.theme.currencySymbol} ${formatNumber(shipMergeCost)}`;
       mergeBadgeEl.textContent = `${mergePairs}`;
-      mergeBadgeEl.style.background = 'var(--accent-purple)';
-      mergeBadgeEl.style.color = '#fff';
+
+      if (canAffordShipMerge) {
+        btnMergeShips.disabled = false;
+        btnMergeShips.classList.add('ready');
+        mergeBadgeEl.style.background = 'var(--accent-purple)';
+        mergeBadgeEl.style.color = '#fff';
+      } else {
+        btnMergeShips.disabled = true;
+        btnMergeShips.classList.remove('ready');
+        mergeBadgeEl.style.background = 'rgba(255, 255, 255, 0.1)';
+        mergeBadgeEl.style.color = 'var(--text-secondary)';
+      }
     } else {
       btnMergeShips.disabled = true;
       btnMergeShips.classList.remove('ready');
@@ -123,14 +134,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Merge Gates Button
     const gateMergePairs = game.getAvailableGateMergePairsCount();
     const totalGates = game.gates.length;
+    const nextGatePair = game.findMergeableGatePair();
+    const gateMergeCost = nextGatePair ? game.getGateMergeCost(nextGatePair[0].tier) : 0;
+    const canAffordGateMerge = game.coins >= gateMergeCost;
 
     if (gateMergePairs > 0) {
-      btnMergeGates.disabled = false;
-      btnMergeGates.classList.add('ready');
-      gateMergeStatusEl.textContent = `${gateMergePairs} Ready`;
+      gateMergeStatusEl.textContent = `${gateMergePairs} Ready • ${game.theme.currencySymbol} ${formatNumber(gateMergeCost)}`;
       gateMergeBadgeEl.textContent = `${gateMergePairs}`;
-      gateMergeBadgeEl.style.background = 'var(--accent-cyan)';
-      gateMergeBadgeEl.style.color = '#000';
+
+      if (canAffordGateMerge) {
+        btnMergeGates.disabled = false;
+        btnMergeGates.classList.add('ready');
+        gateMergeBadgeEl.style.background = 'var(--accent-cyan)';
+        gateMergeBadgeEl.style.color = '#000';
+      } else {
+        btnMergeGates.disabled = true;
+        btnMergeGates.classList.remove('ready');
+        gateMergeBadgeEl.style.background = 'rgba(255, 255, 255, 0.1)';
+        gateMergeBadgeEl.style.color = 'var(--text-secondary)';
+      }
     } else {
       btnMergeGates.disabled = true;
       btnMergeGates.classList.remove('ready');
@@ -207,11 +229,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnMergeShips.addEventListener('click', () => {
-    game.mergeNextPair();
+    const nextShipPair = game.findMergeableShipPair();
+    const cost = nextShipPair ? game.getShipMergeCost(nextShipPair[0].tier) : 0;
+    const merged = game.mergeNextPair();
+    if (merged && renderer) {
+      const R = renderer.orbitRadius || 180;
+      const x = renderer.centerX + Math.cos(merged.angle) * R;
+      const y = renderer.centerY + Math.sin(merged.angle) * R;
+      renderer.addFloatingText(`-${cost} ${game.theme.currencySymbol}`, x, y - 20, '#ffd700');
+    }
   });
 
   btnMergeGates.addEventListener('click', () => {
-    game.mergeNextGatePair();
+    const nextGatePair = game.findMergeableGatePair();
+    const cost = nextGatePair ? game.getGateMergeCost(nextGatePair[0].tier) : 0;
+    const merged = game.mergeNextGatePair();
+    if (merged && renderer) {
+      const R = renderer.orbitRadius || 180;
+      const x = renderer.centerX + Math.cos(merged.angle) * R;
+      const y = renderer.centerY + Math.sin(merged.angle) * R;
+      renderer.addFloatingText(`-${cost} ${game.theme.currencySymbol}`, x, y - 20, '#ffd700');
+    }
   });
 
   // Top Bar Actions
@@ -271,7 +309,15 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (e.key === 'g' || e.key === 'G') {
       game.buyGate();
     } else if (e.key === 'm' || e.key === 'M') {
-      game.mergeNextPair();
+      const nextShipPair = game.findMergeableShipPair();
+      const cost = nextShipPair ? game.getShipMergeCost(nextShipPair[0].tier) : 0;
+      const merged = game.mergeNextPair();
+      if (merged && renderer) {
+        const R = renderer.orbitRadius || 180;
+        const x = renderer.centerX + Math.cos(merged.angle) * R;
+        const y = renderer.centerY + Math.sin(merged.angle) * R;
+        renderer.addFloatingText(`-${cost} ${game.theme.currencySymbol}`, x, y - 20, '#ffd700');
+      }
     } else if (e.key === 's' || e.key === 'S') {
       storeModal.classList.toggle('hidden');
       if (!storeModal.classList.contains('hidden')) {
