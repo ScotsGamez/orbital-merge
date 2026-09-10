@@ -175,8 +175,11 @@
     <div class="modal-content scoreboard-modal-content">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <h2>🏆 Galactic Scoreboard</h2>
-          <span class="modal-subtitle">Galactic Rankings & Fleet Records</span>
+          <div class="modal-title-row">
+            <h2>🏆 Galactic Scoreboard</h2>
+            <span class="live-sync-badge" id="firebase-sync-badge">🟡 Ready to Link</span>
+          </div>
+          <span class="modal-subtitle">Global Real Visitor Rankings & Fleet Records</span>
         </div>
         <button id="close-scoreboard-btn" class="close-btn">&times;</button>
       </div>
@@ -292,6 +295,7 @@
   <!-- Scripts -->
   <script src="src/themes.js?v=2.3.0"></script>
   <script src="src/audio.js?v=2.3.0"></script>
+  <script src="src/scoreboard-service.js?v=2.3.0"></script>
   <script src="src/game.js?v=2.3.0"></script>
   <script src="src/renderer.js?v=2.3.0"></script>
   <script src="script.js?v=2.3.0"></script>

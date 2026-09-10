@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const recHighestGate = document.getElementById('rec-highest-gate');
   const recTotalMerges = document.getElementById('rec-total-merges');
   const recTotalPasses = document.getElementById('rec-total-passes');
+  const firebaseSyncBadge = document.getElementById('firebase-sync-badge');
 
   // -------------------------------------------------------------
   // UI UPDATE METHODS
@@ -241,6 +242,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateScoreboardUI() {
     const lbData = game.getLeaderboard();
     const records = game.getPersonalRecords();
+
+    // 0. Sync Status Badge
+    if (firebaseSyncBadge) {
+      const isConfigured = window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig();
+      if (isConfigured) {
+        firebaseSyncBadge.textContent = '🟢 Real Players Live';
+        firebaseSyncBadge.classList.add('live');
+      } else {
+        firebaseSyncBadge.textContent = '🟡 Real Global Ready';
+        firebaseSyncBadge.classList.remove('live');
+      }
+    }
 
     // 1. Player Standing Card
     if (playerAvatarDisplay) {
@@ -436,9 +449,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Scoreboard Modal Actions
   scoreboardBtn.addEventListener('click', () => {
     audio.playClick();
+    if (window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig()) {
+      window.OrbitalScoreboardService.fetchGlobalScores().catch(() => {});
+    }
     updateScoreboardUI();
     scoreboardModal.classList.remove('hidden');
   });
+
+  if (window.OrbitalScoreboardService) {
+    window.OrbitalScoreboardService.subscribe(() => {
+      if (scoreboardModal && !scoreboardModal.classList.contains('hidden')) {
+        updateScoreboardUI();
+      }
+    });
+  }
 
   closeScoreboardBtn.addEventListener('click', () => {
     audio.playClick();

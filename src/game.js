@@ -442,6 +442,9 @@
       if (currentScore > this.highScore) {
         this.highScore = currentScore;
       }
+      if (window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig()) {
+        window.OrbitalScoreboardService.submitScore(this.playerName, currentScore, shipTier, (this.theme && this.theme.icon) ? this.theme.icon : '🚀');
+      }
       return currentScore;
     }
 
@@ -464,6 +467,50 @@
 
     getLeaderboard() {
       const playerScore = this.calculateScore();
+
+      // Check if real global scores from Firebase are available
+      if (window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig() && window.OrbitalScoreboardService.cachedScores.length > 0) {
+        const realScores = window.OrbitalScoreboardService.cachedScores;
+        const myPlayerId = window.OrbitalScoreboardService.playerId;
+        const hasPlayer = realScores.some(s => s.isPlayer || s.id === myPlayerId);
+        let all = [...realScores];
+        if (!hasPlayer) {
+          all.push({
+            id: myPlayerId,
+            name: this.playerName || 'Commander',
+            avatar: (this.theme && this.theme.icon) ? this.theme.icon : '🚀',
+            tier: this.getHighestShipTier() || 1,
+            score: playerScore,
+            isPlayer: true
+          });
+          all.sort((a, b) => b.score - a.score);
+        }
+
+        let playerRank = 1;
+        let nextRival = null;
+
+        all.forEach((entry, idx) => {
+          entry.rank = idx + 1;
+          if (entry.isPlayer || entry.id === myPlayerId) {
+            entry.isPlayer = true;
+            playerRank = entry.rank;
+            if (idx > 0) {
+              nextRival = all[idx - 1];
+            }
+          }
+        });
+
+        return {
+          entries: all,
+          playerRank,
+          playerScore,
+          totalRanks: all.length,
+          nextRival,
+          pointsToPassNext: nextRival ? Math.max(1, nextRival.score - playerScore + 1) : 0,
+          isRealGlobal: true
+        };
+      }
+
       const rivals = this.getGalacticRivals().map(r => ({
         id: r.id,
         name: r.name,
