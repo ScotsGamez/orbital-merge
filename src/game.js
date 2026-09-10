@@ -16,6 +16,7 @@
       this.gatesBought = 0;
       this.gameSpeed = 1;
       this.maxShipsCapacity = 16;
+      this.maxGatesCapacity = 10;
       this.lastSaveTime = Date.now();
       this.coinsPerSecond = 0;
       this.recentEarnings = []; // Rolling window for CPS calculation
@@ -29,6 +30,7 @@
       this.ships = [];
       this.gates = [];
       this.nextEntityId = 1;
+      this.selectedGateId = null;
 
       // Drag and Drop state
       this.draggedShip = null;
@@ -44,6 +46,7 @@
         { id: 'ships_5', text: 'ADD 5 SPACESHIPS', type: 'ships_count', target: 5, reward: 600 },
         { id: 'buy_gate_3', text: 'ADD 3RD GATE', type: 'gates_count', target: 3, reward: 1000 },
         { id: 'merge_t3', text: 'MERGE A TIER 3 SHIP', type: 'highest_tier', target: 3, reward: 2000 },
+        { id: 'merge_gate_t2', text: 'UPGRADE/MERGE A TIER 2 GATE', type: 'highest_gate_tier', target: 2, reward: 2500 },
         { id: 'earn_5k', text: 'REACH 5,000 COINS', type: 'current_coins', target: 5000, reward: 3000 },
         { id: 'ships_10', text: 'ADD 10 SPACESHIPS', type: 'ships_count', target: 10, reward: 5000 },
         { id: 'buy_gate_4', text: 'ADD 4TH GATE', type: 'gates_count', target: 4, reward: 8000 },
@@ -60,7 +63,8 @@
         onGoalCompleted: [],
         onEntityChange: [],
         onThemeChange: [],
-        onGatePass: []
+        onGatePass: [],
+        onGateSelect: []
       };
 
       // Initialize default entities
@@ -89,7 +93,7 @@
     }
 
     initDefaultEntities() {
-      // Start with 1 ship and 1 gate
+      // Start with 1 ship and 1 gate (Tier 1 Gate starts with 2x multiplier!)
       this.ships = [
         {
           id: this.nextEntityId++,
@@ -106,7 +110,7 @@
           tier: 1,
           angle: Math.PI * 0.5,
           targetAngle: Math.PI * 0.5,
-          multiplier: 1,
+          multiplier: 2,
           pulse: 0
         }
       ];
@@ -164,7 +168,7 @@
     }
 
     canBuyGate() {
-      return this.coins >= this.getGateCost() && this.gates.length < 12;
+      return this.coins >= this.getGateCost() && this.gates.length < this.maxGatesCapacity;
     }
 
     buyShip() {
@@ -203,7 +207,7 @@
     buyGate() {
       const cost = this.getGateCost();
       if (this.coins < cost) return false;
-      if (this.gates.length >= 12) return false;
+      if (this.gates.length >= this.maxGatesCapacity) return false;
 
       this.coins -= cost;
       this.gatesBought++;
@@ -213,7 +217,7 @@
         tier: 1,
         angle: 0,
         targetAngle: 0,
-        multiplier: 1,
+        multiplier: 2, // Tier 1 starts at 2x!
         pulse: 0
       };
 
@@ -241,7 +245,6 @@
         tierMap.get(ship.tier).push(ship);
       }
 
-      // Find lowest tier with at least 2 ships
       const sortedTiers = Array.from(tierMap.keys()).sort((a, b) => a - b);
       for (const tier of sortedTiers) {
         const list = tierMap.get(tier);
@@ -252,7 +255,7 @@
       return null;
     }
 
-    // Count how many pairs can be merged right now
+    // Count how many ship pairs can be merged right now
     getAvailableMergePairsCount() {
       const counts = {};
       for (const ship of this.ships) {
@@ -276,11 +279,9 @@
       const newTier = shipA.tier + 1;
       const targetAngle = shipB.angle;
 
-      // Remove the two old ships
       const toRemove = [shipA.id, shipB.id];
       this.ships = this.ships.filter(s => !toRemove.includes(s.id));
 
-      // Add merged tier ship
       const mergedShip = {
         id: this.nextEntityId++,
         tier: newTier,
@@ -302,51 +303,138 @@
       return mergedShip;
     }
 
-    // Merge next available lowest identical tier pair (Dedicated Merge button action)
     mergeNextPair() {
       const pair = this.findMergeableShipPair();
       if (!pair) return null;
       return this.mergeShips(pair[0], pair[1]);
     }
 
-    // Merge ALL available pairs at once
-    mergeAllPairs() {
-      let mergedCount = 0;
-      let pair = this.findMergeableShipPair();
-      while (pair) {
-        this.mergeShips(pair[0], pair[1]);
-        mergedCount++;
-        pair = this.findMergeableShipPair();
+    // -------------------------------------------------------------
+    // GATE MERGING & UPGRADING
+    // -------------------------------------------------------------
+
+    // Find the first mergeable pair of identical gates
+    findMergeableGatePair() {
+      const tierMap = new Map();
+      for (const gate of this.gates) {
+        if (!tierMap.has(gate.tier)) {
+          tierMap.set(gate.tier, []);
+        }
+        tierMap.get(gate.tier).push(gate);
       }
-      return mergedCount;
+
+      const sortedTiers = Array.from(tierMap.keys()).sort((a, b) => a - b);
+      for (const tier of sortedTiers) {
+        const list = tierMap.get(tier);
+        if (list.length >= 2) {
+          return [list[0], list[1]];
+        }
+      }
+      return null;
     }
 
-    // Gate Upgrade / Merge
-    upgradeGate(gateId) {
-      const gate = this.gates.find(g => g.id === gateId);
-      if (!gate) return false;
+    getAvailableGateMergePairsCount() {
+      const counts = {};
+      for (const gate of this.gates) {
+        counts[gate.tier] = (counts[gate.tier] || 0) + 1;
+      }
+      let pairs = 0;
+      for (const count of Object.values(counts)) {
+        pairs += Math.floor(count / 2);
+      }
+      return pairs;
+    }
 
-      const cost = Math.round(this.BASE_GATE_COST * 1.5 * Math.pow(2, gate.tier - 1));
-      if (this.coins < cost) return false;
+    mergeGates(gateA, gateB) {
+      if (gateA.id === gateB.id || gateA.tier !== gateB.tier) return false;
 
-      this.coins -= cost;
-      gate.tier++;
-      gate.multiplier = Math.pow(2, gate.tier - 1);
+      const idxA = this.gates.findIndex(g => g.id === gateA.id);
+      const idxB = this.gates.findIndex(g => g.id === gateB.id);
+      if (idxA === -1 || idxB === -1) return false;
+
+      const newTier = gateA.tier + 1;
+      const targetAngle = gateB.angle;
+
+      // Remove gateA, upgrade gateB
+      this.gates = this.gates.filter(g => g.id !== gateA.id);
+      const survivingGate = this.gates.find(g => g.id === gateB.id);
+      if (survivingGate) {
+        survivingGate.tier = newTier;
+        survivingGate.multiplier = Math.pow(2, newTier);
+        survivingGate.pulse = 1.2;
+      }
+
+      this.repositionGates(true);
+      this.totalMerges++;
 
       if (window.OrbitalAudio) {
         window.OrbitalAudio.playMerge();
       }
 
+      this.checkGoalProgress();
+      this.emit('onEntityChange');
+      this.save();
+      return survivingGate;
+    }
+
+    mergeNextGatePair() {
+      const pair = this.findMergeableGatePair();
+      if (!pair) return null;
+      return this.mergeGates(pair[0], pair[1]);
+    }
+
+    // Get upgrade cost for an individual gate
+    getGateUpgradeCost(gateId) {
+      const gate = this.gates.find(g => g.id === gateId);
+      if (!gate) return 0;
+      return Math.round(this.BASE_GATE_COST * 0.9 * Math.pow(2, gate.tier));
+    }
+
+    canUpgradeGate(gateId) {
+      const cost = this.getGateUpgradeCost(gateId);
+      return this.coins >= cost && cost > 0;
+    }
+
+    upgradeGate(gateId) {
+      const gate = this.gates.find(g => g.id === gateId);
+      if (!gate) return false;
+
+      const cost = this.getGateUpgradeCost(gateId);
+      if (this.coins < cost) return false;
+
+      this.coins -= cost;
+      gate.tier++;
+      gate.multiplier = Math.pow(2, gate.tier);
+      gate.pulse = 1.0;
+
+      if (window.OrbitalAudio) {
+        window.OrbitalAudio.playMerge();
+      }
+
+      this.checkGoalProgress();
       this.emit('onEntityChange');
       this.emit('onCoinUpdate');
       this.save();
       return true;
     }
 
-    // Get highest ship tier currently on track
+    selectGate(id) {
+      this.selectedGateId = id;
+      this.emit('onGateSelect', this.getSelectedGate());
+    }
+
+    getSelectedGate() {
+      return this.gates.find(g => g.id === this.selectedGateId) || null;
+    }
+
     getHighestShipTier() {
       if (this.ships.length === 0) return 0;
       return Math.max(...this.ships.map(s => s.tier));
+    }
+
+    getHighestGateTier() {
+      if (this.gates.length === 0) return 0;
+      return Math.max(...this.gates.map(g => g.tier));
     }
 
     // Goal Evaluation
@@ -354,7 +442,6 @@
       if (this.goalIndex < this.goals.length) {
         return this.goals[this.goalIndex];
       }
-      // Procedural endless goals
       const endlessStep = this.goalIndex - this.goals.length + 1;
       const target = 20 + endlessStep * 5;
       return {
@@ -378,6 +465,9 @@
           break;
         case 'highest_tier':
           current = this.getHighestShipTier();
+          break;
+        case 'highest_gate_tier':
+          current = this.getHighestGateTier();
           break;
         case 'current_coins':
           current = this.coins;
@@ -417,9 +507,7 @@
       }
     }
 
-    // Main Update Loop (Physics, Angular Movement, Collision)
     update(dt) {
-      // Apply speed multiplier
       const effectiveDt = dt * this.gameSpeed;
 
       // 1. Smoothly interpolate gates to their target angles
@@ -429,7 +517,6 @@
         }
         if (gate.angle !== gate.targetAngle) {
           let diff = gate.targetAngle - gate.angle;
-          // Normalize angle difference to [-PI, PI]
           while (diff < -Math.PI) diff += Math.PI * 2;
           while (diff > Math.PI) diff -= Math.PI * 2;
           gate.angle += diff * Math.min(1, effectiveDt * 5);
@@ -442,7 +529,6 @@
       let frameEarnings = 0;
 
       this.ships.forEach(ship => {
-        // Skip movement if currently being dragged
         if (this.draggedShip && this.draggedShip.id === ship.id) return;
 
         const tierCfg = this.getShipTierConfig(ship.tier);
@@ -450,7 +536,6 @@
         const prevAngle = ship.angle;
         let newAngle = (prevAngle + angularVelocity * effectiveDt) % TWO_PI;
 
-        // Collision Check: did ship pass any gate?
         this.gates.forEach(gate => {
           let passed = false;
           const gAngle = (gate.angle % TWO_PI + TWO_PI) % TWO_PI;
@@ -460,16 +545,14 @@
               passed = true;
             }
           } else {
-            // Crossed 0 / 2*PI boundary
             if (gAngle >= prevAngle || gAngle < newAngle) {
               passed = true;
             }
           }
 
           if (passed) {
-            // Payout calculation
             const shipBaseVal = this.getShipPayout(ship.tier);
-            const gateMult = gate.multiplier || 1;
+            const gateMult = gate.multiplier || 2;
             const payout = shipBaseVal * gateMult;
 
             this.coins += payout;
@@ -482,7 +565,6 @@
               window.OrbitalAudio.playCoin(ship.tier);
             }
 
-            // Emit gate pass event for floating text and particle triggers
             this.emit('onGatePass', {
               ship: ship,
               gate: gate,
@@ -494,7 +576,7 @@
         ship.angle = newAngle;
       });
 
-      // 3. Track rolling Coins Per Second (CPS)
+      // 3. Rolling CPS
       const now = performance.now();
       if (frameEarnings > 0) {
         this.recentEarnings.push({ time: now, amount: frameEarnings });
@@ -503,21 +585,17 @@
       const sumRecent = this.recentEarnings.reduce((acc, e) => acc + e.amount, 0);
       this.coinsPerSecond = Math.round(sumRecent / 1.5);
 
-      // Periodically check goal progress (for coins thresholds)
       this.checkGoalProgress();
 
-      // Emit coin update if money changed
       if (frameEarnings > 0) {
         this.emit('onCoinUpdate');
       }
 
-      // Auto-save every 5 seconds
       if (Date.now() - this.lastSaveTime > 5000) {
         this.save();
       }
     }
 
-    // Event Subscription System
     on(event, callback) {
       if (this.listeners[event]) {
         this.listeners[event].push(callback);
@@ -530,11 +608,10 @@
       }
     }
 
-    // Save & Load
     save() {
       this.lastSaveTime = Date.now();
       const stateData = {
-        version: 1,
+        version: 2,
         theme: this.currentThemeId,
         coins: this.coins,
         lifetimeCoins: this.lifetimeCoins,
@@ -562,7 +639,7 @@
         }
 
         const data = JSON.parse(raw);
-        if (data && data.version === 1) {
+        if (data) {
           this.currentThemeId = data.theme || 'deep-space';
           this.coins = Math.max(0, data.coins || 0);
           this.lifetimeCoins = Math.max(this.coins, data.lifetimeCoins || this.coins);
@@ -583,29 +660,28 @@
           }
 
           if (Array.isArray(data.gates) && data.gates.length > 0) {
-            this.gates = data.gates.map(g => ({
-              id: this.nextEntityId++,
-              tier: g.tier || 1,
-              angle: g.angle || 0,
-              targetAngle: g.angle || 0,
-              multiplier: g.multiplier || Math.pow(2, (g.tier || 1) - 1),
-              pulse: 0
-            }));
+            this.gates = data.gates.map(g => {
+              const tier = g.tier || 1;
+              return {
+                id: this.nextEntityId++,
+                tier: tier,
+                angle: g.angle || 0,
+                targetAngle: g.angle || 0,
+                multiplier: Math.max(2, g.multiplier || Math.pow(2, tier)),
+                pulse: 0
+              };
+            });
             this.repositionGates(false);
           }
 
-          // Offline idle earnings calculation (up to 6 hours)
           if (data.timestamp) {
             const elapsedSeconds = Math.min(6 * 3600, (Date.now() - data.timestamp) / 1000);
             if (elapsedSeconds > 10) {
               const estRate = this.calculateEstimatedIdleRate();
-              const offlineGain = Math.round(estRate * elapsedSeconds * 0.5); // 50% efficiency
+              const offlineGain = Math.round(estRate * elapsedSeconds * 0.5);
               if (offlineGain > 0) {
                 this.coins += offlineGain;
                 this.lifetimeCoins += offlineGain;
-                setTimeout(() => {
-                  alert(`Welcome Back, Commander!\nWhile you were offline, your fleet generated ${offlineGain.toLocaleString()} ${this.theme.currencyName}!`);
-                }, 400);
               }
             }
           }
@@ -622,8 +698,7 @@
       let totalShipValue = 0;
       this.ships.forEach(s => totalShipValue += this.getShipPayout(s.tier));
       let totalGateMult = 0;
-      this.gates.forEach(g => totalGateMult += (g.multiplier || 1));
-      // Average 1 lap every ~6.5 seconds per ship
+      this.gates.forEach(g => totalGateMult += (g.multiplier || 2));
       return Math.round((totalShipValue * totalGateMult) / 6.5);
     }
 

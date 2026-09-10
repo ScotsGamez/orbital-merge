@@ -43,11 +43,12 @@
         { tier: 8, name: 'Hyperdrive Titan', color: '#00ffea', secondaryColor: '#ff00aa', size: 27, speedMult: 1.65, valueMult: 850 }
       ],
       gateTiers: [
-        { tier: 1, name: 'Alpha Node', color: '#00f0ff', pulseColor: 'rgba(0, 240, 255, 0.7)', multiplier: 1 },
-        { tier: 2, name: 'Beta Accelerator', color: '#00ff88', pulseColor: 'rgba(0, 255, 136, 0.7)', multiplier: 2 },
-        { tier: 3, name: 'Gamma Warp Gate', color: '#ffd700', pulseColor: 'rgba(255, 215, 0, 0.7)', multiplier: 4 },
-        { tier: 4, name: 'Delta Vortex Gate', color: '#ff2d75', pulseColor: 'rgba(255, 45, 117, 0.7)', multiplier: 8 },
-        { tier: 5, name: 'Omega Rift Gate', color: '#b026ff', pulseColor: 'rgba(176, 38, 255, 0.8)', multiplier: 16 }
+        { tier: 1, name: 'Alpha Gate', color: '#00f0ff', pulseColor: 'rgba(0, 240, 255, 0.7)', multiplier: 2 },
+        { tier: 2, name: 'Beta Accelerator', color: '#00ff88', pulseColor: 'rgba(0, 255, 136, 0.7)', multiplier: 4 },
+        { tier: 3, name: 'Gamma Warp Gate', color: '#ffd700', pulseColor: 'rgba(255, 215, 0, 0.7)', multiplier: 8 },
+        { tier: 4, name: 'Delta Vortex Gate', color: '#ff2d75', pulseColor: 'rgba(255, 45, 117, 0.7)', multiplier: 16 },
+        { tier: 5, name: 'Omega Rift Gate', color: '#b026ff', pulseColor: 'rgba(176, 38, 255, 0.8)', multiplier: 32 },
+        { tier: 6, name: 'Singularity Conduit', color: '#ffffff', pulseColor: 'rgba(255, 255, 255, 0.9)', multiplier: 64 }
       ]
     },
 
@@ -88,11 +89,12 @@
         { tier: 8, name: 'Celestial Sovereign', color: '#fef08a', secondaryColor: '#f43f5e', size: 28, speedMult: 1.65, valueMult: 850 }
       ],
       gateTiers: [
-        { tier: 1, name: 'Stone Arch', color: '#fbbf24', pulseColor: 'rgba(251, 191, 36, 0.7)', multiplier: 1 },
-        { tier: 2, name: 'Emerald Gateway', color: '#34d399', pulseColor: 'rgba(52, 211, 153, 0.7)', multiplier: 2 },
-        { tier: 3, name: 'Sapphire Shrine', color: '#60a5fa', pulseColor: 'rgba(96, 165, 250, 0.7)', multiplier: 4 },
-        { tier: 4, name: 'Amethyst Sanctum', color: '#c084fc', pulseColor: 'rgba(192, 132, 252, 0.7)', multiplier: 8 },
-        { tier: 5, name: 'Celestial Zenith', color: '#fef08a', pulseColor: 'rgba(254, 240, 138, 0.8)', multiplier: 16 }
+        { tier: 1, name: 'Stone Arch', color: '#fbbf24', pulseColor: 'rgba(251, 191, 36, 0.7)', multiplier: 2 },
+        { tier: 2, name: 'Emerald Gateway', color: '#34d399', pulseColor: 'rgba(52, 211, 153, 0.7)', multiplier: 4 },
+        { tier: 3, name: 'Sapphire Shrine', color: '#60a5fa', pulseColor: 'rgba(96, 165, 250, 0.7)', multiplier: 8 },
+        { tier: 4, name: 'Amethyst Sanctum', color: '#c084fc', pulseColor: 'rgba(192, 132, 252, 0.7)', multiplier: 16 },
+        { tier: 5, name: 'Celestial Zenith', color: '#fef08a', pulseColor: 'rgba(254, 240, 138, 0.8)', multiplier: 32 },
+        { tier: 6, name: 'Ethereal Apex', color: '#ffffff', pulseColor: 'rgba(255, 255, 255, 0.9)', multiplier: 64 }
       ]
     },
 
@@ -133,11 +135,12 @@
         { tier: 8, name: 'Synthesized AI Core', color: '#ffe600', secondaryColor: '#00ffcc', size: 26, speedMult: 1.65, valueMult: 850 }
       ],
       gateTiers: [
-        { tier: 1, name: 'Proxy Filter', color: '#ff007f', pulseColor: 'rgba(255, 0, 127, 0.7)', multiplier: 1 },
-        { tier: 2, name: 'SSL Tunnel', color: '#00ffcc', pulseColor: 'rgba(0, 255, 204, 0.7)', multiplier: 2 },
-        { tier: 3, name: 'Packet Decryptor', color: '#39ff14', pulseColor: 'rgba(57, 255, 20, 0.7)', multiplier: 4 },
-        { tier: 4, name: 'Mainframe Router', color: '#ffe600', pulseColor: 'rgba(255, 230, 0, 0.7)', multiplier: 8 },
-        { tier: 5, name: 'Quantum Firewall', color: '#a855f7', pulseColor: 'rgba(168, 85, 247, 0.8)', multiplier: 16 }
+        { tier: 1, name: 'Proxy Filter', color: '#ff007f', pulseColor: 'rgba(255, 0, 127, 0.7)', multiplier: 2 },
+        { tier: 2, name: 'SSL Tunnel', color: '#00ffcc', pulseColor: 'rgba(0, 255, 204, 0.7)', multiplier: 4 },
+        { tier: 3, name: 'Packet Decryptor', color: '#39ff14', pulseColor: 'rgba(57, 255, 20, 0.7)', multiplier: 8 },
+        { tier: 4, name: 'Mainframe Router', color: '#ffe600', pulseColor: 'rgba(255, 230, 0, 0.7)', multiplier: 16 },
+        { tier: 5, name: 'Quantum Firewall', color: '#a855f7', pulseColor: 'rgba(168, 85, 247, 0.8)', multiplier: 32 },
+        { tier: 6, name: 'Zero-Day Shield', color: '#ffffff', pulseColor: 'rgba(255, 255, 255, 0.9)', multiplier: 64 }
       ]
     }
   };

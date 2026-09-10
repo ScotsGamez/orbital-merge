@@ -22,6 +22,10 @@
       </div>
 
       <div class="top-actions">
+        <button id="tracker-btn" class="icon-btn tracker-btn" title="Issue & Feature Tracker">
+          <span class="tracker-icon">📋</span>
+          <span class="tracker-label">TRACKER</span>
+        </button>
         <button id="speed-btn" class="icon-btn" title="Toggle Game Speed">
           <span class="speed-badge" id="speed-indicator">1x</span>
         </button>
@@ -53,21 +57,59 @@
     <!-- Main Play Area (The Orbit) -->
     <main class="orbit-area">
       <canvas id="orbitCanvas"></canvas>
+      
+      <!-- Gate Inspector HUD Card (Shown when gate is clicked) -->
+      <div id="gate-inspector" class="gate-inspector-card hidden">
+        <div class="inspector-header">
+          <div class="inspector-title-group">
+            <span class="inspector-badge" id="insp-gate-badge">GATE #1</span>
+            <h4 id="insp-gate-name">Alpha Gate (Tier 1)</h4>
+          </div>
+          <button id="close-inspector-btn" class="close-card-btn">&times;</button>
+        </div>
+        <div class="inspector-body">
+          <div class="inspector-metric">
+            <span class="metric-label">Multiplier</span>
+            <span class="metric-val" id="insp-gate-mult">2x</span>
+          </div>
+          <div class="inspector-actions">
+            <button id="btn-upgrade-selected-gate" class="action-btn upgrade-gate-btn">
+              <span>UPGRADE (+1 TIER)</span>
+              <span class="cost-tag" id="insp-gate-cost">🪙 100</span>
+            </button>
+            <button id="btn-merge-selected-gate" class="action-btn merge-gate-btn" disabled>
+              <span>MERGE PAIR</span>
+              <span class="cost-tag" id="insp-gate-merge-status">No Match</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="orbit-overlay-hint">
-        <span>💡 Drag & drop matching ships to merge them!</span>
+        <span>💡 Click a gate to upgrade it • Drag ships to merge!</span>
       </div>
     </main>
 
     <!-- Bottom Control Panel -->
     <footer class="bottom-panel">
-      <!-- Merge Button -->
-      <button id="btn-merge" class="control-btn merge-btn" disabled>
+      <!-- Merge Ships Button -->
+      <button id="btn-merge-ships" class="control-btn merge-btn" disabled>
         <div class="btn-icon">⚡</div>
         <div class="btn-content">
-          <span class="btn-title">MERGE</span>
-          <span class="btn-subtitle" id="merge-status">0/0 Ready</span>
+          <span class="btn-title">MERGE SHIPS</span>
+          <span class="btn-subtitle" id="merge-status">0 Ready</span>
         </div>
         <div class="btn-badge" id="merge-badge">0</div>
+      </button>
+
+      <!-- Merge Gates Button -->
+      <button id="btn-merge-gates" class="control-btn merge-gate-ctrl-btn" disabled>
+        <div class="btn-icon">🌀</div>
+        <div class="btn-content">
+          <span class="btn-title">MERGE GATES</span>
+          <span class="btn-subtitle" id="gate-merge-status">0 Ready</span>
+        </div>
+        <div class="btn-badge" id="gate-merge-badge">0</div>
       </button>
 
       <!-- Buy Ship Button -->
@@ -82,12 +124,12 @@
 
       <!-- Buy Gate Button -->
       <button id="btn-buy-gate" class="control-btn green-cta buy-gate-btn">
-        <div class="btn-icon">🌀</div>
+        <div class="btn-icon">⛩️</div>
         <div class="btn-content">
           <span class="btn-title" id="buy-gate-title">+1 GATE</span>
           <span class="btn-cost" id="buy-gate-cost">🪙 120</span>
         </div>
-        <div class="btn-capacity" id="gate-capacity">1/12</div>
+        <div class="btn-capacity" id="gate-capacity">1/10</div>
       </button>
     </footer>
   </div>
@@ -104,7 +146,6 @@
         <section class="modal-section">
           <h3>SELECT THEME</h3>
           <div class="theme-grid">
-            <!-- Theme 1: Deep Space -->
             <div class="theme-card active" data-theme="deep-space">
               <div class="theme-badge">Active</div>
               <div class="theme-preview space-preview">🚀</div>
@@ -113,7 +154,6 @@
               <div class="theme-currency">Currency: 🪙 Credits</div>
             </div>
 
-            <!-- Theme 2: Fantasy Realm -->
             <div class="theme-card" data-theme="fantasy-realm">
               <div class="theme-preview fantasy-preview">🐉</div>
               <h4>Fantasy Realm</h4>
@@ -121,7 +161,6 @@
               <div class="theme-currency">Currency: 💎 Mana Gems</div>
             </div>
 
-            <!-- Theme 3: Cyberpunk -->
             <div class="theme-card" data-theme="cyberpunk">
               <div class="theme-preview cyber-preview">⚡</div>
               <h4>Cyberpunk</h4>
@@ -155,6 +194,53 @@
 
         <section class="modal-section dangerous-section">
           <button id="reset-game-btn" class="danger-btn">⚠️ Reset Game Progress</button>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue & Feature Tracker Modal -->
+  <div id="tracker-modal" class="modal-overlay hidden">
+    <div class="modal-content tracker-modal-content">
+      <div class="modal-header">
+        <div class="header-title-wrapper">
+          <h2>📋 GitHub Issue & Feature Tracker</h2>
+          <span class="tracker-subtitle">Log ideas, bugs, and balance requests for the AI to fix</span>
+        </div>
+        <button id="close-tracker-btn" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- New Issue Submission Form -->
+        <section class="modal-section new-issue-section">
+          <h3>SUBMIT NEW FEATURE / BUG</h3>
+          <form id="new-issue-form" class="issue-form">
+            <div class="form-row">
+              <input type="text" id="issue-title" class="form-input" placeholder="Title (e.g., Add prestige reset system)" required />
+              <select id="issue-type" class="form-select">
+                <option value="Feature Request">💡 Feature Request</option>
+                <option value="Bug Report">🐛 Bug Report</option>
+                <option value="Game Balance">⚖️ Game Balance</option>
+                <option value="Visual Polish">🎨 Visual Polish</option>
+              </select>
+            </div>
+            <textarea id="issue-desc" class="form-textarea" placeholder="Detailed description of your idea or what needs fixing..." rows="3" required></textarea>
+            <div class="form-actions">
+              <button type="submit" class="submit-issue-btn">➕ Submit to Tracker</button>
+              <button type="button" id="copy-issues-markdown-btn" class="secondary-btn">📋 Copy for GitHub</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Tracked Issues List -->
+        <section class="modal-section">
+          <div class="section-title-bar">
+            <h3>TRACKED ISSUES (<span id="issue-count">0</span>)</h3>
+            <span class="filter-hint">Stored locally & synced with FEATURE_TRACKER.md</span>
+          </div>
+          <div id="issues-list" class="issues-list">
+            <!-- Dynamically populated -->
+          </div>
         </section>
       </div>
     </div>

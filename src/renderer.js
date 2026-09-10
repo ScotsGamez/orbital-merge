@@ -27,11 +27,12 @@
       this.bgElements = [];
       this.bgInitialized = false;
 
-      // Drag and Drop
+      // Drag and Drop / Selection
       this.draggedShip = null;
       this.dragPos = { x: 0, y: 0 };
       this.hoverTargetShip = null;
       this.isPointerDown = false;
+      this.selectedGate = null;
 
       // Animation loop
       this.lastFrameTime = performance.now();
@@ -44,7 +45,6 @@
     initEvents() {
       window.addEventListener('resize', () => this.resize());
 
-      // Listen for game events
       this.game.on('onGatePass', data => {
         this.createGatePassEffect(data);
       });
@@ -53,7 +53,7 @@
         this.createCelebrationBurst();
       });
 
-      // Canvas Pointer Drag-and-Drop
+      // Canvas Pointer Interactions
       this.canvas.addEventListener('pointerdown', e => this.handlePointerDown(e));
       window.addEventListener('pointermove', e => this.handlePointerMove(e));
       window.addEventListener('pointerup', e => this.handlePointerUp(e));
@@ -122,16 +122,16 @@
       // Clear Screen
       ctx.clearRect(0, 0, this.width, this.height);
 
-      // 1. Draw Background (Stars / Runes / Circuit Grid based on Theme)
+      // 1. Draw Background
       this.drawBackground(dt);
 
-      // 2. Draw Center Core / Hub
+      // 2. Draw Center Core / Hub (NO EMOJI - Pure Sci-Fi Singularity)
       this.drawCenterHub();
 
       // 3. Draw Orbit Track
       this.drawTrack();
 
-      // 4. Draw Gates
+      // 4. Draw Gates (Rotated spanning across the line)
       this.drawGates();
 
       // 5. Draw Engine Trails
@@ -158,7 +158,6 @@
       const now = performance.now() * 0.001;
 
       if (theme.id === 'deep-space') {
-        // Space nebula glow
         const grad = ctx.createRadialGradient(
           this.centerX, this.centerY, this.orbitRadius * 0.2,
           this.centerX, this.centerY, this.width * 0.7
@@ -169,7 +168,6 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, this.width, this.height);
 
-        // Twinkling stars
         this.bgElements.forEach(star => {
           const flicker = Math.sin(now * 3 + star.phase) * 0.3 + 0.7;
           ctx.fillStyle = `rgba(220, 240, 255, ${star.alpha * flicker})`;
@@ -179,7 +177,6 @@
         });
 
       } else if (theme.id === 'fantasy-realm') {
-        // Arcane rune ring
         const grad = ctx.createRadialGradient(
           this.centerX, this.centerY, 10,
           this.centerX, this.centerY, this.orbitRadius * 1.4
@@ -190,7 +187,6 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, this.width, this.height);
 
-        // Drifting magical mana particles
         this.bgElements.forEach(star => {
           star.y -= star.speed * 20;
           if (star.y < 0) star.y = this.height;
@@ -202,7 +198,6 @@
         });
 
       } else if (theme.id === 'cyberpunk') {
-        // Cyber digital grid
         ctx.strokeStyle = 'rgba(0, 255, 204, 0.05)';
         ctx.lineWidth = 1;
         const gridSize = 45;
@@ -219,7 +214,6 @@
           ctx.stroke();
         }
 
-        // Circuit nodes
         this.bgElements.forEach(star => {
           const flicker = Math.sin(now * 8 + star.phase) > 0.3 ? 0.9 : 0.1;
           ctx.fillStyle = `rgba(255, 0, 127, ${flicker * 0.6})`;
@@ -228,6 +222,7 @@
       }
     }
 
+    // High-tech Sci-Fi Singularity Center Core (NO EMOJI)
     drawCenterHub() {
       const ctx = this.ctx;
       const theme = this.game.theme;
@@ -236,34 +231,56 @@
       ctx.save();
       ctx.translate(this.centerX, this.centerY);
 
-      // Pulsing center planet / sun / core
-      const pulse = Math.sin(now * 2) * 2;
-      const coreRadius = 26 + pulse;
+      // Rotating Outer Energy Ring
+      ctx.save();
+      ctx.rotate(now * 0.4);
+      ctx.strokeStyle = theme.cssVars['--accent-cyan'];
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 14]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 38, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
 
-      // Glow halo
-      const haloGrad = ctx.createRadialGradient(0, 0, coreRadius * 0.5, 0, 0, coreRadius * 2.2);
+      // Counter-rotating Inner Tech Ring
+      ctx.save();
+      ctx.rotate(-now * 0.6);
+      ctx.strokeStyle = theme.cssVars['--accent-purple'];
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([4, 10]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 30, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Pulsing Glow Aura
+      const pulse = Math.sin(now * 2.5) * 3;
+      const coreRadius = 22 + pulse;
+
+      const haloGrad = ctx.createRadialGradient(0, 0, coreRadius * 0.4, 0, 0, coreRadius * 2.5);
       haloGrad.addColorStop(0, theme.cssVars['--accent-glow']);
       haloGrad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = haloGrad;
       ctx.beginPath();
-      ctx.arc(0, 0, coreRadius * 2.2, 0, Math.PI * 2);
+      ctx.arc(0, 0, coreRadius * 2.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Main Core sphere
-      const coreGrad = ctx.createRadialGradient(-coreRadius * 0.3, -coreRadius * 0.3, 2, 0, 0, coreRadius);
+      // Core Plasma Sphere
+      const coreGrad = ctx.createRadialGradient(-coreRadius * 0.25, -coreRadius * 0.25, 2, 0, 0, coreRadius);
       coreGrad.addColorStop(0, '#ffffff');
-      coreGrad.addColorStop(0.3, theme.cssVars['--accent-cyan']);
-      coreGrad.addColorStop(1, theme.cssVars['--accent-purple']);
+      coreGrad.addColorStop(0.35, theme.cssVars['--accent-cyan']);
+      coreGrad.addColorStop(0.85, theme.cssVars['--accent-purple']);
+      coreGrad.addColorStop(1, '#0b0f1e');
       ctx.fillStyle = coreGrad;
       ctx.beginPath();
       ctx.arc(0, 0, coreRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Center Icon
-      ctx.font = '16px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(theme.icon, 0, 1);
+      // Center Singularity Eye
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
+      ctx.fill();
 
       ctx.restore();
     }
@@ -301,6 +318,7 @@
       ctx.restore();
     }
 
+    // Rotated Gates that Span Across the Orbit Track as a Real Archway
     drawGates() {
       const ctx = this.ctx;
       const R = this.orbitRadius;
@@ -312,51 +330,66 @@
 
         const gateCfg = this.game.getGateTierConfig(gate.tier);
         const pulse = gate.pulse || 0;
+        const isSelected = this.game.selectedGateId === gate.id;
 
         ctx.save();
         ctx.translate(gx, gy);
-        ctx.rotate(angle + Math.PI / 2); // Orient perpendicular to orbit
+        // Rotate by 'angle' so local X-axis is RADIAL (outward).
+        // The beam spanning from -halfWidth to +halfWidth crosses the track from inside to outside!
+        ctx.rotate(angle);
 
-        // Gate beam glow / field
-        const beamHalfWidth = 24 + pulse * 6;
-        const beamThickness = 4 + pulse * 4;
+        const beamHalfWidth = 24 + pulse * 6; // Radial distance between pylons
+        const pylonDepth = 8; // Tangential thickness of pylons
 
-        // Passing pulse flare
+        // Selection highlight ring if selected
+        if (isSelected) {
+          ctx.strokeStyle = '#ffd700';
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.arc(0, 0, beamHalfWidth + 12, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        // Passing Pulse Flare
         if (pulse > 0.05) {
           ctx.fillStyle = gateCfg.pulseColor;
           ctx.shadowColor = gateCfg.color;
-          ctx.shadowBlur = 16 * pulse;
+          ctx.shadowBlur = 18 * pulse;
           ctx.beginPath();
-          ctx.arc(0, 0, 20 * pulse, 0, Math.PI * 2);
+          ctx.arc(0, 0, 22 * pulse, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Energy Field line between pylons
+        // Energy Plasma Beam spanning ACROSS the orbital track (from inner to outer radius)
         const fieldGrad = ctx.createLinearGradient(-beamHalfWidth, 0, beamHalfWidth, 0);
         fieldGrad.addColorStop(0, gateCfg.color);
         fieldGrad.addColorStop(0.5, '#ffffff');
         fieldGrad.addColorStop(1, gateCfg.color);
 
         ctx.strokeStyle = fieldGrad;
-        ctx.lineWidth = beamThickness;
+        ctx.lineWidth = 4 + pulse * 4;
         ctx.shadowColor = gateCfg.color;
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.moveTo(-beamHalfWidth, 0);
         ctx.lineTo(beamHalfWidth, 0);
         ctx.stroke();
 
-        // Inner & Outer Pylons
+        // Inner & Outer Pylons (oriented straddling the track line)
+        // Inner pylon at x = -beamHalfWidth, Outer pylon at x = +beamHalfWidth
         [-beamHalfWidth, beamHalfWidth].forEach(px => {
           ctx.fillStyle = '#101424';
           ctx.strokeStyle = gateCfg.color;
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.roundRect(px - 5, -9, 10, 18, 3);
+          // Pylon oriented perpendicular to beam, so it faces along the track like an arch post
+          ctx.roundRect(px - 4, -pylonDepth, 8, pylonDepth * 2, 3);
           ctx.fill();
           ctx.stroke();
 
-          // Pylon LED light
+          // Pylon LED / Power Crystal
           ctx.fillStyle = gateCfg.color;
           ctx.beginPath();
           ctx.arc(px, 0, 2.5, 0, Math.PI * 2);
@@ -365,26 +398,27 @@
 
         ctx.restore();
 
-        // Draw Upright Gate Multiplier Pill Badge
-        const outerPylonDist = R + 34;
+        // Multiplier Pill Badge - Positioned cleanly outside the outer pylon
+        const outerPylonDist = R + beamHalfWidth + 14;
         const badgeX = this.centerX + Math.cos(angle) * outerPylonDist;
         const badgeY = this.centerY + Math.sin(angle) * outerPylonDist;
 
         ctx.save();
         ctx.translate(badgeX, badgeY);
-        ctx.fillStyle = 'rgba(10, 16, 32, 0.85)';
+        ctx.fillStyle = 'rgba(10, 16, 32, 0.88)';
         ctx.strokeStyle = gateCfg.color;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
-        ctx.roundRect(-14, -8, 28, 16, 4);
+        ctx.roundRect(-16, -8, 32, 16, 4);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = 'bold 9px monospace';
+        ctx.font = 'bold 9.5px monospace';
         ctx.fillStyle = gateCfg.color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(`x${gate.multiplier || 1}`, 0, 1);
+        // Multiplier display: 2x, 4x, 8x, etc.
+        ctx.fillText(`${gate.multiplier || 2}x`, 0, 1);
         ctx.restore();
       });
     }
@@ -393,7 +427,6 @@
       const ctx = this.ctx;
       const R = this.orbitRadius;
 
-      // Spawn trail particles for moving ships
       this.game.ships.forEach(ship => {
         if (this.draggedShip && this.draggedShip.id === ship.id) return;
 
@@ -401,7 +434,6 @@
         const sy = this.centerY + Math.sin(ship.angle) * (R + (ship.radiusOffset || 0));
         const tierCfg = this.game.getShipTierConfig(ship.tier);
 
-        // Exhaust emitter at rear
         const rearAngle = ship.angle - 0.05;
         const rx = this.centerX + Math.cos(rearAngle) * (R + (ship.radiusOffset || 0));
         const ry = this.centerY + Math.sin(rearAngle) * (R + (ship.radiusOffset || 0));
@@ -416,7 +448,6 @@
         });
       });
 
-      // Update & Render trails
       for (let i = this.shipTrails.length - 1; i >= 0; i--) {
         const tr = this.shipTrails[i];
         tr.life -= dt;
@@ -450,7 +481,7 @@
         } else {
           x = this.centerX + Math.cos(ship.angle) * (R + (ship.radiusOffset || 0));
           y = this.centerY + Math.sin(ship.angle) * (R + (ship.radiusOffset || 0));
-          heading = ship.angle + Math.PI / 2; // Tangent angle clockwise
+          heading = ship.angle + Math.PI / 2;
         }
 
         const tierCfg = this.game.getShipTierConfig(ship.tier);
@@ -460,7 +491,6 @@
         ctx.translate(x, y);
         ctx.rotate(heading);
 
-        // Highlight if hovered during drag
         if (this.hoverTargetShip && this.hoverTargetShip.id === ship.id) {
           ctx.strokeStyle = '#00ff88';
           ctx.lineWidth = 3;
@@ -471,7 +501,6 @@
           ctx.stroke();
         }
 
-        // Draw entity model based on current theme
         if (theme.id === 'deep-space') {
           this.drawSpaceShip(ctx, ship, tierCfg, s);
         } else if (theme.id === 'fantasy-realm') {
@@ -482,7 +511,7 @@
 
         ctx.restore();
 
-        // Draw Upright Tier Pill Badge
+        // Upright Tier Pill Badge
         ctx.save();
         ctx.translate(x, y - s - 10);
         ctx.fillStyle = 'rgba(10, 14, 28, 0.85)';
@@ -503,25 +532,22 @@
     }
 
     drawSpaceShip(ctx, ship, tierCfg, s) {
-      // Glow shadow
       ctx.shadowColor = tierCfg.color;
       ctx.shadowBlur = 10;
 
-      // Fuselage / Wings
       ctx.fillStyle = '#161e38';
       ctx.strokeStyle = tierCfg.color;
       ctx.lineWidth = 2;
 
       ctx.beginPath();
-      ctx.moveTo(s * 1.2, 0); // Nose (facing forward)
-      ctx.lineTo(-s * 0.9, -s * 0.75); // Left wing
-      ctx.lineTo(-s * 0.5, 0); // Engine indent
-      ctx.lineTo(-s * 0.9, s * 0.75); // Right wing
+      ctx.moveTo(s * 1.2, 0);
+      ctx.lineTo(-s * 0.9, -s * 0.75);
+      ctx.lineTo(-s * 0.5, 0);
+      ctx.lineTo(-s * 0.9, s * 0.75);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
 
-      // Cockpit / Accent Glow Core
       ctx.fillStyle = tierCfg.secondaryColor;
       ctx.beginPath();
       ctx.moveTo(s * 0.5, 0);
@@ -530,7 +556,6 @@
       ctx.closePath();
       ctx.fill();
 
-      // Engine Thruster Flare
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(-s * 0.5, 0, 2.5, 0, Math.PI * 2);
@@ -543,7 +568,6 @@
       ctx.shadowColor = tierCfg.color;
       ctx.shadowBlur = 10;
 
-      // Dragon Wings
       ctx.fillStyle = tierCfg.secondaryColor;
       ctx.beginPath();
       ctx.moveTo(0, 0);
@@ -559,13 +583,11 @@
       ctx.closePath();
       ctx.fill();
 
-      // Dragon Body & Tail
       ctx.fillStyle = tierCfg.color;
       ctx.beginPath();
       ctx.ellipse(0, 0, s * 0.8, s * 0.35, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Dragon Head
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(s * 0.75, 0, s * 0.25, 0, Math.PI * 2);
@@ -576,7 +598,6 @@
       ctx.shadowColor = tierCfg.color;
       ctx.shadowBlur = 12;
 
-      // Diamond / Data Byte Polygon
       ctx.fillStyle = '#0f172a';
       ctx.strokeStyle = tierCfg.color;
       ctx.lineWidth = 2;
@@ -590,11 +611,9 @@
       ctx.fill();
       ctx.stroke();
 
-      // Inner pulsating node
       ctx.fillStyle = tierCfg.secondaryColor;
       ctx.fillRect(-s * 0.25, -s * 0.25, s * 0.5, s * 0.5);
 
-      // Binary bit stream sparks
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(s * 0.4, -1, 3, 2);
     }
@@ -602,8 +621,6 @@
     drawDragInteraction() {
       if (!this.draggedShip) return;
       const ctx = this.ctx;
-
-      // Draw dashed guideline back to orbit
       const R = this.orbitRadius;
       const homeX = this.centerX + Math.cos(this.draggedShip.angle) * R;
       const homeY = this.centerY + Math.sin(this.draggedShip.angle) * R;
@@ -617,7 +634,6 @@
       ctx.lineTo(this.dragPos.x, this.dragPos.y);
       ctx.stroke();
 
-      // If hovering over compatible ship, draw link beam with "MERGE!"
       if (this.hoverTargetShip) {
         const targetX = this.centerX + Math.cos(this.hoverTargetShip.angle) * R;
         const targetY = this.centerY + Math.sin(this.hoverTargetShip.angle) * R;
@@ -632,7 +648,6 @@
         ctx.lineTo(targetX, targetY);
         ctx.stroke();
 
-        // Merge prompt tag
         const midX = (this.dragPos.x + targetX) / 2;
         const midY = (this.dragPos.y + targetY) / 2;
         ctx.setLineDash([]);
@@ -653,7 +668,6 @@
       const gy = this.centerY + Math.sin(angle) * R;
       const currency = this.game.theme.currencySymbol;
 
-      // 1. Spawn Floating Text Popup
       this.floatingTexts.push({
         text: `+${data.payout.toLocaleString()} ${currency}`,
         x: gx,
@@ -664,7 +678,6 @@
         color: '#ffd700'
       });
 
-      // 2. Spawn Burst Particles
       const count = 10;
       const tierCfg = this.game.getShipTierConfig(data.ship.tier);
       for (let i = 0; i < count; i++) {
@@ -755,7 +768,6 @@
       ctx.globalAlpha = 1.0;
     }
 
-    // Pointer Drag-and-Drop Handling
     getCanvasCoords(e) {
       const rect = this.canvas.getBoundingClientRect();
       return {
@@ -777,8 +789,30 @@
       return null;
     }
 
+    findGateNear(x, y, threshold = 32) {
+      const R = this.orbitRadius;
+      for (const gate of this.game.gates) {
+        const gx = this.centerX + Math.cos(gate.angle) * R;
+        const gy = this.centerY + Math.sin(gate.angle) * R;
+        const dist = Math.hypot(x - gx, y - gy);
+        if (dist <= threshold) {
+          return gate;
+        }
+      }
+      return null;
+    }
+
     handlePointerDown(e) {
       const coords = this.getCanvasCoords(e);
+
+      // Check if clicking on a gate
+      const gate = this.findGateNear(coords.x, coords.y);
+      if (gate) {
+        this.game.selectGate(gate.id);
+        return;
+      }
+
+      // Check if dragging a ship
       const ship = this.findShipNear(coords.x, coords.y);
       if (ship) {
         this.draggedShip = ship;
@@ -786,6 +820,9 @@
         this.dragPos = coords;
         this.isPointerDown = true;
         this.canvas.setPointerCapture(e.pointerId);
+      } else {
+        // Deselect gate if clicking empty space
+        this.game.selectGate(null);
       }
     }
 
@@ -793,7 +830,6 @@
       if (!this.draggedShip) return;
       this.dragPos = this.getCanvasCoords(e);
 
-      // Check if hovering over another ship of the same tier
       const target = this.findShipNear(this.dragPos.x, this.dragPos.y, 42);
       if (target && target.id !== this.draggedShip.id && target.tier === this.draggedShip.tier) {
         this.hoverTargetShip = target;
@@ -805,7 +841,6 @@
     handlePointerUp(e) {
       if (this.draggedShip) {
         if (this.hoverTargetShip) {
-          // Trigger Merge!
           this.game.mergeShips(this.draggedShip, this.hoverTargetShip);
         }
         this.draggedShip = null;

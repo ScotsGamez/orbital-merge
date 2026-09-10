@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const balanceIcon = document.getElementById('balance-icon');
   const coinBalanceEl = document.getElementById('coin-balance');
   const cpsRateEl = document.getElementById('cps-rate');
+  const trackerBtn = document.getElementById('tracker-btn');
   const speedBtn = document.getElementById('speed-btn');
   const speedIndicator = document.getElementById('speed-indicator');
   const soundBtn = document.getElementById('sound-btn');
@@ -28,10 +29,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const goalRewardEl = document.getElementById('goal-reward');
   const goalProgressFill = document.getElementById('goal-progress-fill');
 
+  // DOM Elements - Gate Inspector HUD
+  const gateInspector = document.getElementById('gate-inspector');
+  const inspGateBadge = document.getElementById('insp-gate-badge');
+  const inspGateName = document.getElementById('insp-gate-name');
+  const inspGateMult = document.getElementById('insp-gate-mult');
+  const btnUpgradeGate = document.getElementById('btn-upgrade-selected-gate');
+  const inspGateCost = document.getElementById('insp-gate-cost');
+  const btnMergeGate = document.getElementById('btn-merge-selected-gate');
+  const inspGateMergeStatus = document.getElementById('insp-gate-merge-status');
+  const closeInspectorBtn = document.getElementById('close-inspector-btn');
+
   // DOM Elements - Bottom Control Panel
-  const btnMerge = document.getElementById('btn-merge');
+  const btnMergeShips = document.getElementById('btn-merge-ships');
   const mergeStatusEl = document.getElementById('merge-status');
   const mergeBadgeEl = document.getElementById('merge-badge');
+
+  const btnMergeGates = document.getElementById('btn-merge-gates');
+  const gateMergeStatusEl = document.getElementById('gate-merge-status');
+  const gateMergeBadgeEl = document.getElementById('gate-merge-badge');
 
   const btnBuyShip = document.getElementById('btn-buy-ship');
   const buyShipTitleEl = document.getElementById('buy-ship-title');
@@ -43,16 +59,110 @@ document.addEventListener('DOMContentLoaded', () => {
   const buyGateCostEl = document.getElementById('buy-gate-cost');
   const gateCapacityEl = document.getElementById('gate-capacity');
 
-  // DOM Elements - Modal
+  // DOM Elements - Modals
   const storeModal = document.getElementById('store-modal');
   const closeModalBtn = document.getElementById('close-modal-btn');
   const themeCards = document.querySelectorAll('.theme-card');
   const resetGameBtn = document.getElementById('reset-game-btn');
 
+  const trackerModal = document.getElementById('tracker-modal');
+  const closeTrackerBtn = document.getElementById('close-tracker-btn');
+  const newIssueForm = document.getElementById('new-issue-form');
+  const issueTitleInput = document.getElementById('issue-title');
+  const issueTypeSelect = document.getElementById('issue-type');
+  const issueDescText = document.getElementById('issue-desc');
+  const issuesListEl = document.getElementById('issues-list');
+  const issueCountEl = document.getElementById('issue-count');
+  const copyIssuesMarkdownBtn = document.getElementById('copy-issues-markdown-btn');
+
   const statLifetimeEl = document.getElementById('stat-lifetime');
   const statPassesEl = document.getElementById('stat-passes');
   const statMergesEl = document.getElementById('stat-merges');
   const statTierEl = document.getElementById('stat-tier');
+
+  // -------------------------------------------------------------
+  // ISSUE & FEATURE TRACKER STORE
+  // -------------------------------------------------------------
+  const DEFAULT_ISSUES = [
+    {
+      id: 1,
+      title: 'Rotate gates across orbital line',
+      type: 'Visual Polish',
+      status: 'Resolved',
+      desc: 'Rotated energy gates by 90° so they span radially across the track as authentic archways that ships fly through.'
+    },
+    {
+      id: 2,
+      title: 'Remove rocket emoji from center core',
+      type: 'Visual Polish',
+      status: 'Resolved',
+      desc: 'Replaced emoji with a high-tech sci-fi pulsating energy singularity with dual counter-rotating tech rings.'
+    },
+    {
+      id: 3,
+      title: 'Gate multiplier scaling: eliminate 1x',
+      type: 'Game Balance',
+      status: 'Resolved',
+      desc: 'Upgraded gate multipliers to start at 2x base and scale by powers of 2 (2x, 4x, 8x, 16x...) so payouts are mathematically meaningful.'
+    },
+    {
+      id: 4,
+      title: 'Gate merging and individual gate upgrading',
+      type: 'Feature Request',
+      status: 'Resolved',
+      desc: 'Added direct gate click inspection HUD for individual gate upgrades and a dedicated MERGE GATES button to combine identical gate tiers.'
+    },
+    {
+      id: 5,
+      title: 'Interactive GitHub Issue & Feature Tracker',
+      type: 'Feature Request',
+      status: 'Resolved',
+      desc: 'Built in-game tracker modal with localStorage persistence, Markdown copy for GitHub, and repository FEATURE_TRACKER.md board.'
+    }
+  ];
+
+  let trackedIssues = [];
+  try {
+    const saved = localStorage.getItem('orbital_merge_issues');
+    if (saved) {
+      trackedIssues = JSON.parse(saved);
+    } else {
+      trackedIssues = DEFAULT_ISSUES;
+      localStorage.setItem('orbital_merge_issues', JSON.stringify(trackedIssues));
+    }
+  } catch (e) {
+    trackedIssues = DEFAULT_ISSUES;
+  }
+
+  function renderIssuesList() {
+    issuesListEl.innerHTML = '';
+    issueCountEl.textContent = trackedIssues.length;
+
+    trackedIssues.forEach(issue => {
+      const item = document.createElement('div');
+      item.className = 'issue-item';
+
+      const isResolved = issue.status === 'Resolved';
+      const statusClass = isResolved ? 'status-resolved' : 'status-open';
+      const statusIcon = isResolved ? '✅' : '💡';
+
+      item.innerHTML = `
+        <div class="issue-item-header">
+          <span class="issue-title-text">#${issue.id} ${escapeHtml(issue.title)}</span>
+          <div class="issue-tags">
+            <span class="tag-type">${escapeHtml(issue.type)}</span>
+            <span class="tag-status ${statusClass}">${statusIcon} ${escapeHtml(issue.status)}</span>
+          </div>
+        </div>
+        <p class="issue-desc-text">${escapeHtml(issue.desc)}</p>
+      `;
+      issuesListEl.appendChild(item);
+    });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
   // -------------------------------------------------------------
   // UI UPDATE METHODS
@@ -71,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     balanceIcon.textContent = game.theme.currencySymbol;
 
     updateButtonsState();
+    updateGateInspector();
   }
 
   function updateGoalUI() {
@@ -83,46 +194,94 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateButtonsState() {
-    // 1. Merge Button
+    // 1. Merge Ships Button
     const mergePairs = game.getAvailableMergePairsCount();
     const totalShips = game.ships.length;
 
     if (mergePairs > 0) {
-      btnMerge.disabled = false;
-      btnMerge.classList.add('ready');
-      mergeStatusEl.textContent = `${mergePairs} Pair${mergePairs > 1 ? 's' : ''} Ready`;
+      btnMergeShips.disabled = false;
+      btnMergeShips.classList.add('ready');
+      mergeStatusEl.textContent = `${mergePairs} Ready`;
       mergeBadgeEl.textContent = `${mergePairs}`;
       mergeBadgeEl.style.background = 'var(--accent-purple)';
       mergeBadgeEl.style.color = '#fff';
     } else {
-      btnMerge.disabled = true;
-      btnMerge.classList.remove('ready');
+      btnMergeShips.disabled = true;
+      btnMergeShips.classList.remove('ready');
       mergeStatusEl.textContent = '0 Ready';
       mergeBadgeEl.textContent = `${totalShips}/${game.maxShipsCapacity}`;
       mergeBadgeEl.style.background = 'rgba(0, 0, 0, 0.3)';
       mergeBadgeEl.style.color = 'var(--text-secondary)';
     }
 
-    // 2. Buy Ship Button
+    // 2. Merge Gates Button
+    const gateMergePairs = game.getAvailableGateMergePairsCount();
+    const totalGates = game.gates.length;
+
+    if (gateMergePairs > 0) {
+      btnMergeGates.disabled = false;
+      btnMergeGates.classList.add('ready');
+      gateMergeStatusEl.textContent = `${gateMergePairs} Ready`;
+      gateMergeBadgeEl.textContent = `${gateMergePairs}`;
+      gateMergeBadgeEl.style.background = 'var(--accent-cyan)';
+      gateMergeBadgeEl.style.color = '#000';
+    } else {
+      btnMergeGates.disabled = true;
+      btnMergeGates.classList.remove('ready');
+      gateMergeStatusEl.textContent = '0 Ready';
+      gateMergeBadgeEl.textContent = `${totalGates}/${game.maxGatesCapacity}`;
+      gateMergeBadgeEl.style.background = 'rgba(0, 0, 0, 0.3)';
+      gateMergeBadgeEl.style.color = 'var(--text-secondary)';
+    }
+
+    // 3. Buy Ship Button
     const shipCost = game.getShipCost();
     buyShipCostEl.textContent = `${game.theme.currencySymbol} ${formatNumber(shipCost)}`;
     buyShipTitleEl.textContent = `+1 ${game.theme.entityName.toUpperCase()}`;
     shipCapacityEl.textContent = `${game.ships.length}/${game.maxShipsCapacity}`;
     btnBuyShip.disabled = !game.canBuyShip();
 
-    // 3. Buy Gate Button
+    // 4. Buy Gate Button
     const gateCost = game.getGateCost();
     buyGateCostEl.textContent = `${game.theme.currencySymbol} ${formatNumber(gateCost)}`;
     buyGateTitleEl.textContent = `+1 ${game.theme.gateName.toUpperCase()}`;
-    gateCapacityEl.textContent = `${game.gates.length}/12`;
+    gateCapacityEl.textContent = `${game.gates.length}/${game.maxGatesCapacity}`;
     btnBuyGate.disabled = !game.canBuyGate();
+  }
+
+  function updateGateInspector() {
+    const gate = game.getSelectedGate();
+    if (!gate) {
+      gateInspector.classList.add('hidden');
+      return;
+    }
+
+    gateInspector.classList.remove('hidden');
+    const gateCfg = game.getGateTierConfig(gate.tier);
+    const cost = game.getGateUpgradeCost(gate.id);
+
+    inspGateBadge.textContent = `GATE #${gate.id}`;
+    inspGateName.textContent = `${gateCfg.name} (Tier ${gate.tier})`;
+    inspGateMult.textContent = `${gate.multiplier || 2}x`;
+    inspGateCost.textContent = `${game.theme.currencySymbol} ${formatNumber(cost)}`;
+
+    btnUpgradeGate.disabled = !game.canUpgradeGate(gate.id);
+
+    // Check if another gate of identical tier exists to merge
+    const matchingGate = game.gates.find(g => g.id !== gate.id && g.tier === gate.tier);
+    if (matchingGate) {
+      btnMergeGate.disabled = false;
+      inspGateMergeStatus.textContent = `Match with #${matchingGate.id}`;
+    } else {
+      btnMergeGate.disabled = true;
+      inspGateMergeStatus.textContent = 'No Match';
+    }
   }
 
   function updateThemeUI() {
     const theme = game.theme;
     balanceIcon.textContent = theme.currencySymbol;
 
-    // Update Theme card active state
     themeCards.forEach(card => {
       if (card.dataset.theme === theme.id) {
         card.classList.add('active');
@@ -147,11 +306,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // EVENT LISTENERS & BINDINGS
   // -------------------------------------------------------------
 
-  // Game Engine Events
   game.on('onCoinUpdate', () => updateBalanceUI());
   game.on('onGoalProgress', () => updateGoalUI());
-  game.on('onEntityChange', () => updateButtonsState());
+  game.on('onEntityChange', () => {
+    updateButtonsState();
+    updateGateInspector();
+  });
   game.on('onThemeChange', () => updateThemeUI());
+  game.on('onGateSelect', () => updateGateInspector());
   game.on('onGoalCompleted', goal => {
     updateGoalUI();
     updateBalanceUI();
@@ -166,8 +328,35 @@ document.addEventListener('DOMContentLoaded', () => {
     game.buyGate();
   });
 
-  btnMerge.addEventListener('click', () => {
+  btnMergeShips.addEventListener('click', () => {
     game.mergeNextPair();
+  });
+
+  btnMergeGates.addEventListener('click', () => {
+    game.mergeNextGatePair();
+  });
+
+  // Gate Inspector Actions
+  btnUpgradeGate.addEventListener('click', () => {
+    const gate = game.getSelectedGate();
+    if (gate) {
+      game.upgradeGate(gate.id);
+    }
+  });
+
+  btnMergeGate.addEventListener('click', () => {
+    const gate = game.getSelectedGate();
+    if (gate) {
+      const matchingGate = game.gates.find(g => g.id !== gate.id && g.tier === gate.tier);
+      if (matchingGate) {
+        game.mergeGates(gate, matchingGate);
+        game.selectGate(matchingGate.id);
+      }
+    }
+  });
+
+  closeInspectorBtn.addEventListener('click', () => {
+    game.selectGate(null);
   });
 
   // Top Bar Actions
@@ -196,10 +385,67 @@ document.addEventListener('DOMContentLoaded', () => {
     storeModal.classList.add('hidden');
   });
 
-  storeModal.addEventListener('click', e => {
-    if (e.target === storeModal) {
-      storeModal.classList.add('hidden');
-    }
+  trackerBtn.addEventListener('click', () => {
+    audio.playClick();
+    renderIssuesList();
+    trackerModal.classList.remove('hidden');
+  });
+
+  closeTrackerBtn.addEventListener('click', () => {
+    audio.playClick();
+    trackerModal.classList.add('hidden');
+  });
+
+  [storeModal, trackerModal].forEach(modal => {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+      }
+    });
+  });
+
+  // Issue Form Submission
+  newIssueForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const title = issueTitleInput.value.trim();
+    const type = issueTypeSelect.value;
+    const desc = issueDescText.value.trim();
+
+    if (!title || !desc) return;
+
+    const newIssue = {
+      id: trackedIssues.length + 1,
+      title: title,
+      type: type,
+      status: 'Open',
+      desc: desc
+    };
+
+    trackedIssues.unshift(newIssue);
+    try {
+      localStorage.setItem('orbital_merge_issues', JSON.stringify(trackedIssues));
+    } catch (err) {}
+
+    renderIssuesList();
+    newIssueForm.reset();
+    audio.playBuy();
+    alert(`Issue #${newIssue.id} "${title}" logged successfully! The AI assistant can now review and resolve it.`);
+  });
+
+  // Copy Issues as Markdown for GitHub
+  copyIssuesMarkdownBtn.addEventListener('click', () => {
+    let md = '# 📋 Orbital Merge - Feature & Issue Tracker\n\n';
+    md += '| ID | Title | Type | Status | Description |\n';
+    md += '| :--- | :--- | :--- | :--- | :--- |\n';
+    trackedIssues.forEach(issue => {
+      md += `| #${issue.id} | **${issue.title}** | \`${issue.type}\` | ${issue.status === 'Resolved' ? '✅ Resolved' : '💡 Open'} | ${issue.desc} |\n`;
+    });
+
+    navigator.clipboard.writeText(md).then(() => {
+      alert('Markdown table copied to clipboard! You can paste this directly into GitHub Issues, PRs, or chat.');
+    }).catch(() => {
+      prompt('Copy your issues markdown below:', md);
+    });
   });
 
   // Theme Switching
@@ -220,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard Shortcuts
   window.addEventListener('keydown', e => {
-    if (e.target.tagName === 'INPUT') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.code === 'Space') {
       e.preventDefault();
       game.buyShip();
@@ -233,10 +479,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!storeModal.classList.contains('hidden')) {
         updateStatsModal();
       }
+    } else if (e.key === 't' || e.key === 'T') {
+      trackerModal.classList.toggle('hidden');
+      if (!trackerModal.classList.contains('hidden')) {
+        renderIssuesList();
+      }
     }
   });
 
-  // Check for URL query params (e.g. ?theme=fantasy-realm, ?store=1)
+  // Query Params
   try {
     const params = new URLSearchParams(window.location.search);
     const themeParam = params.get('theme');
@@ -247,10 +498,15 @@ document.addEventListener('DOMContentLoaded', () => {
       updateStatsModal();
       storeModal.classList.remove('hidden');
     }
+    if (params.get('tracker') === '1' || params.get('tracker') === 'true') {
+      renderIssuesList();
+      trackerModal.classList.remove('hidden');
+    }
   } catch (e) {}
 
   // Initial Sync
   soundIcon.textContent = audio.muted ? '🔇' : '🔊';
+  renderIssuesList();
   updateThemeUI();
   updateGoalUI();
   updateBalanceUI();
