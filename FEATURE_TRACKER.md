@@ -13,6 +13,7 @@ This document serves as the project's central issue board and idea backlog. You 
 | **#3** | **Gate multiplier scaling: eliminate 1x** | `Game Balance` | ✅ **Resolved** | Upgraded gate multipliers to start at 2x base and scale by powers of 2 (2x, 4x, 8x, 16x...) so payouts are mathematically meaningful. |
 | **#4** | **Gate merging and individual gate upgrading** | `Feature Request` | ✅ **Resolved** | Added direct gate click inspection HUD for individual gate upgrades and a dedicated `MERGE GATES` button to combine identical gate tiers. |
 | **#5** | **Interactive GitHub Issue & Feature Tracker** | `Feature Request` | ✅ **Resolved** | Built in-game tracker modal with localStorage persistence, Markdown export for GitHub, and repository tracker board. |
+| **#6** | **Ship Level 1 starts with 1 coin economy & scaling** | `Game Balance` | ✅ **Resolved** | Configured Level 1 ship base payout to 1 coin and base cost to 1 coin, with smooth exponential pacing for tiers, gates, and missions. |
 
 ---
 

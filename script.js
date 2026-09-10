@@ -118,6 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
       type: 'Feature Request',
       status: 'Resolved',
       desc: 'Built in-game tracker modal with localStorage persistence, Markdown copy for GitHub, and repository FEATURE_TRACKER.md board.'
+    },
+    {
+      id: 6,
+      title: 'Ship Level 1 starts with 1 coin economy and scaling',
+      type: 'Game Balance',
+      status: 'Resolved',
+      desc: 'Configured Level 1 ship to generate 1 coin per gate pass and cost 1 coin to buy, scaling smoothly for higher tiers and milestones.'
     }
   ];
 
@@ -262,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     inspGateBadge.textContent = `GATE #${gate.id}`;
     inspGateName.textContent = `${gateCfg.name} (Tier ${gate.tier})`;
-    inspGateMult.textContent = `${gate.multiplier || 2}x`;
+    inspGateMult.textContent = gate.tier === 1 ? '1x (Base)' : `${gate.multiplier}x`;
     inspGateCost.textContent = `${game.theme.currencySymbol} ${formatNumber(cost)}`;
 
     btnUpgradeGate.disabled = !game.canUpgradeGate(gate.id);

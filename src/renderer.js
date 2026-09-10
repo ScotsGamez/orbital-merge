@@ -418,7 +418,8 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         // Multiplier display: 2x, 4x, 8x, etc.
-        ctx.fillText(`${gate.multiplier || 2}x`, 0, 1);
+        const badgeText = gateCfg.badge || (gate.tier > 1 ? `${gate.multiplier}x` : 'Lv.1');
+        ctx.fillText(badgeText, 0, 1);
         ctx.restore();
       });
     }

@@ -8,8 +8,9 @@
   class GameState {
     constructor() {
       this.currentThemeId = 'deep-space';
-      this.coins = 50;
-      this.lifetimeCoins = 50;
+      // Economy starting from 1 coin
+      this.coins = 3;
+      this.lifetimeCoins = 3;
       this.totalPasses = 0;
       this.totalMerges = 0;
       this.shipsBought = 0;
@@ -19,11 +20,11 @@
       this.maxGatesCapacity = 10;
       this.lastSaveTime = Date.now();
       this.coinsPerSecond = 0;
-      this.recentEarnings = []; // Rolling window for CPS calculation
+      this.recentEarnings = [];
 
-      // Base Economy Constants
-      this.BASE_SHIP_COST = 40;
-      this.BASE_GATE_COST = 120;
+      // Base Economy Constants: Ship Level 1 starts with 1 coin!
+      this.BASE_SHIP_COST = 1;
+      this.BASE_GATE_COST = 5;
       this.COST_EXPONENT = 1.15; // New Cost = Base Cost * 1.15^Owned
 
       // Entities
@@ -36,27 +37,26 @@
       this.draggedShip = null;
       this.hoveredShip = null;
 
-      // Goal System
+      // Goal System scaled for 1-coin progression
       this.goalIndex = 0;
       this.goals = [
-        { id: 'buy_ship_1', text: 'ADD 2 SPACESHIPS', type: 'ships_count', target: 2, reward: 80 },
-        { id: 'buy_gate_2', text: 'ADD 2ND GATE', type: 'gates_count', target: 2, reward: 150 },
-        { id: 'merge_t2', text: 'MERGE A TIER 2 SHIP', type: 'highest_tier', target: 2, reward: 300 },
-        { id: 'earn_500', text: 'REACH 500 COINS', type: 'current_coins', target: 500, reward: 400 },
-        { id: 'ships_5', text: 'ADD 5 SPACESHIPS', type: 'ships_count', target: 5, reward: 600 },
-        { id: 'buy_gate_3', text: 'ADD 3RD GATE', type: 'gates_count', target: 3, reward: 1000 },
-        { id: 'merge_t3', text: 'MERGE A TIER 3 SHIP', type: 'highest_tier', target: 3, reward: 2000 },
-        { id: 'merge_gate_t2', text: 'UPGRADE/MERGE A TIER 2 GATE', type: 'highest_gate_tier', target: 2, reward: 2500 },
+        { id: 'buy_ship_1', text: 'ADD 2 SPACESHIPS', type: 'ships_count', target: 2, reward: 5 },
+        { id: 'merge_t2', text: 'MERGE A TIER 2 SHIP', type: 'highest_tier', target: 2, reward: 10 },
+        { id: 'buy_gate_2', text: 'ADD 2ND GATE', type: 'gates_count', target: 2, reward: 15 },
+        { id: 'earn_50', text: 'REACH 50 COINS', type: 'current_coins', target: 50, reward: 25 },
+        { id: 'merge_gate_t2', text: 'UPGRADE/MERGE A TIER 2 GATE', type: 'highest_gate_tier', target: 2, reward: 50 },
+        { id: 'ships_5', text: 'ADD 5 SPACESHIPS', type: 'ships_count', target: 5, reward: 75 },
+        { id: 'merge_t3', text: 'MERGE A TIER 3 SHIP', type: 'highest_tier', target: 3, reward: 150 },
+        { id: 'earn_500', text: 'REACH 500 COINS', type: 'current_coins', target: 500, reward: 250 },
+        { id: 'buy_gate_3', text: 'ADD 3RD GATE', type: 'gates_count', target: 3, reward: 500 },
+        { id: 'ships_10', text: 'ADD 10 SPACESHIPS', type: 'ships_count', target: 10, reward: 750 },
+        { id: 'merge_t4', text: 'MERGE A TIER 4 SHIP', type: 'highest_tier', target: 4, reward: 1500 },
         { id: 'earn_5k', text: 'REACH 5,000 COINS', type: 'current_coins', target: 5000, reward: 3000 },
-        { id: 'ships_10', text: 'ADD 10 SPACESHIPS', type: 'ships_count', target: 10, reward: 5000 },
-        { id: 'buy_gate_4', text: 'ADD 4TH GATE', type: 'gates_count', target: 4, reward: 8000 },
-        { id: 'merge_t4', text: 'MERGE A TIER 4 SHIP', type: 'highest_tier', target: 4, reward: 12000 },
-        { id: 'ships_20', text: 'ADD 20 SPACESHIPS', type: 'ships_bought_total', target: 20, reward: 25000 },
-        { id: 'merge_t5', text: 'MERGE A TIER 5 SHIP', type: 'highest_tier', target: 5, reward: 50000 },
-        { id: 'earn_100k', text: 'REACH 100,000 COINS', type: 'current_coins', target: 100000, reward: 100000 }
+        { id: 'ships_20', text: 'ADD 20 SPACESHIPS', type: 'ships_bought_total', target: 20, reward: 10000 },
+        { id: 'merge_t5', text: 'MERGE A TIER 5 SHIP', type: 'highest_tier', target: 5, reward: 25000 },
+        { id: 'earn_100k', text: 'REACH 100,000 COINS', type: 'current_coins', target: 100000, reward: 50000 }
       ];
 
-      // Event Listeners for UI updates
       this.listeners = {
         onCoinUpdate: [],
         onGoalProgress: [],
@@ -67,7 +67,6 @@
         onGateSelect: []
       };
 
-      // Initialize default entities
       this.initDefaultEntities();
       this.loadSave();
     }
@@ -93,7 +92,7 @@
     }
 
     initDefaultEntities() {
-      // Start with 1 ship and 1 gate (Tier 1 Gate starts with 2x multiplier!)
+      // Start with 1 Level 1 Ship and 1 Level 1 Gate
       this.ships = [
         {
           id: this.nextEntityId++,
@@ -110,7 +109,7 @@
           tier: 1,
           angle: Math.PI * 0.5,
           targetAngle: Math.PI * 0.5,
-          multiplier: 2,
+          multiplier: 1,
           pulse: 0
         }
       ];
@@ -118,7 +117,6 @@
       this.repositionGates(false);
     }
 
-    // Reposition gates symmetrically along the orbital circle
     repositionGates(smooth = true) {
       const count = this.gates.length;
       if (count === 0) return;
@@ -133,34 +131,31 @@
       });
     }
 
-    // Get current tier configuration for ships
     getShipTierConfig(tier) {
       const tiers = this.theme.tiers;
       const idx = Math.min(tier - 1, tiers.length - 1);
       return tiers[idx] || tiers[0];
     }
 
-    // Base payout formula: Ship Tier Value * Gate Tier Multiplier
+    // Ship Tier Base Payout: Tier 1 is 1 coin!
     getShipPayout(tier) {
       const cfg = this.getShipTierConfig(tier);
-      const baseValue = 10;
-      return Math.round(baseValue * cfg.valueMult);
+      return cfg.baseValue || 1;
     }
 
-    // Get gate tier configuration
     getGateTierConfig(tier) {
       const tiers = this.theme.gateTiers;
       const idx = Math.min(tier - 1, tiers.length - 1);
       return tiers[idx] || tiers[0];
     }
 
-    // Economy Cost Formulas: Base Cost * 1.15^Owned
+    // Economy Cost Formulas: Ship Level 1 starts with 1 coin!
     getShipCost() {
-      return Math.round(this.BASE_SHIP_COST * Math.pow(this.COST_EXPONENT, this.shipsBought));
+      return Math.max(1, Math.round(this.BASE_SHIP_COST * Math.pow(this.COST_EXPONENT, this.shipsBought)));
     }
 
     getGateCost() {
-      return Math.round(this.BASE_GATE_COST * Math.pow(this.COST_EXPONENT * 1.1, this.gatesBought));
+      return Math.max(5, Math.round(this.BASE_GATE_COST * Math.pow(1.25, this.gatesBought)));
     }
 
     canBuyShip() {
@@ -179,7 +174,6 @@
       this.coins -= cost;
       this.shipsBought++;
 
-      // Stagger new ship spawn angle to avoid overlapping
       const lastAngle = this.ships.length > 0 ? this.ships[this.ships.length - 1].angle : 0;
       const newAngle = (lastAngle - (Math.PI * 2) / (this.ships.length + 1) + Math.PI * 2) % (Math.PI * 2);
 
@@ -217,7 +211,7 @@
         tier: 1,
         angle: 0,
         targetAngle: 0,
-        multiplier: 2, // Tier 1 starts at 2x!
+        multiplier: 1,
         pulse: 0
       };
 
@@ -235,7 +229,6 @@
       return true;
     }
 
-    // Find the first mergeable pair of identical ships
     findMergeableShipPair() {
       const tierMap = new Map();
       for (const ship of this.ships) {
@@ -255,7 +248,6 @@
       return null;
     }
 
-    // Count how many ship pairs can be merged right now
     getAvailableMergePairsCount() {
       const counts = {};
       for (const ship of this.ships) {
@@ -268,7 +260,6 @@
       return pairs;
     }
 
-    // Execute Merge on a specific pair of ships
     mergeShips(shipA, shipB) {
       if (shipA.id === shipB.id || shipA.tier !== shipB.tier) return false;
 
@@ -313,7 +304,6 @@
     // GATE MERGING & UPGRADING
     // -------------------------------------------------------------
 
-    // Find the first mergeable pair of identical gates
     findMergeableGatePair() {
       const tierMap = new Map();
       for (const gate of this.gates) {
@@ -353,14 +343,12 @@
       if (idxA === -1 || idxB === -1) return false;
 
       const newTier = gateA.tier + 1;
-      const targetAngle = gateB.angle;
 
-      // Remove gateA, upgrade gateB
       this.gates = this.gates.filter(g => g.id !== gateA.id);
       const survivingGate = this.gates.find(g => g.id === gateB.id);
       if (survivingGate) {
         survivingGate.tier = newTier;
-        survivingGate.multiplier = Math.pow(2, newTier);
+        survivingGate.multiplier = Math.pow(2, newTier - 1);
         survivingGate.pulse = 1.2;
       }
 
@@ -383,11 +371,10 @@
       return this.mergeGates(pair[0], pair[1]);
     }
 
-    // Get upgrade cost for an individual gate
     getGateUpgradeCost(gateId) {
       const gate = this.gates.find(g => g.id === gateId);
       if (!gate) return 0;
-      return Math.round(this.BASE_GATE_COST * 0.9 * Math.pow(2, gate.tier));
+      return Math.round(10 * Math.pow(2.2, gate.tier - 1));
     }
 
     canUpgradeGate(gateId) {
@@ -404,7 +391,7 @@
 
       this.coins -= cost;
       gate.tier++;
-      gate.multiplier = Math.pow(2, gate.tier);
+      gate.multiplier = Math.pow(2, gate.tier - 1);
       gate.pulse = 1.0;
 
       if (window.OrbitalAudio) {
@@ -437,7 +424,6 @@
       return Math.max(...this.gates.map(g => g.tier));
     }
 
-    // Goal Evaluation
     getCurrentGoal() {
       if (this.goalIndex < this.goals.length) {
         return this.goals[this.goalIndex];
@@ -449,7 +435,7 @@
         text: `FLEET EXPANSION: REACH ${target} SHIPS BOUGHT`,
         type: 'ships_bought_total',
         target: target,
-        reward: 50000 * endlessStep
+        reward: 5000 * endlessStep
       };
     }
 
@@ -552,7 +538,7 @@
 
           if (passed) {
             const shipBaseVal = this.getShipPayout(ship.tier);
-            const gateMult = gate.multiplier || 2;
+            const gateMult = gate.multiplier || 1;
             const payout = shipBaseVal * gateMult;
 
             this.coins += payout;
@@ -583,7 +569,7 @@
       }
       this.recentEarnings = this.recentEarnings.filter(e => now - e.time <= 1500);
       const sumRecent = this.recentEarnings.reduce((acc, e) => acc + e.amount, 0);
-      this.coinsPerSecond = Math.round(sumRecent / 1.5);
+      this.coinsPerSecond = Number((sumRecent / 1.5).toFixed(1));
 
       this.checkGoalProgress();
 
@@ -611,7 +597,7 @@
     save() {
       this.lastSaveTime = Date.now();
       const stateData = {
-        version: 2,
+        version: 3, // Incremented version for 1-coin economy
         theme: this.currentThemeId,
         coins: this.coins,
         lifetimeCoins: this.lifetimeCoins,
@@ -639,50 +625,54 @@
         }
 
         const data = JSON.parse(raw);
-        if (data) {
-          this.currentThemeId = data.theme || 'deep-space';
-          this.coins = Math.max(0, data.coins || 0);
-          this.lifetimeCoins = Math.max(this.coins, data.lifetimeCoins || this.coins);
-          this.totalPasses = data.totalPasses || 0;
-          this.totalMerges = data.totalMerges || 0;
-          this.shipsBought = data.shipsBought || 0;
-          this.gatesBought = data.gatesBought || 0;
-          this.goalIndex = data.goalIndex || 0;
+        // If old version (< 3), reset to start clean with 1-coin economy
+        if (!data.version || data.version < 3) {
+          this.applyThemeStyles();
+          return;
+        }
 
-          if (Array.isArray(data.ships) && data.ships.length > 0) {
-            this.ships = data.ships.map(s => ({
+        this.currentThemeId = data.theme || 'deep-space';
+        this.coins = Math.max(0, data.coins || 0);
+        this.lifetimeCoins = Math.max(this.coins, data.lifetimeCoins || this.coins);
+        this.totalPasses = data.totalPasses || 0;
+        this.totalMerges = data.totalMerges || 0;
+        this.shipsBought = data.shipsBought || 0;
+        this.gatesBought = data.gatesBought || 0;
+        this.goalIndex = data.goalIndex || 0;
+
+        if (Array.isArray(data.ships) && data.ships.length > 0) {
+          this.ships = data.ships.map(s => ({
+            id: this.nextEntityId++,
+            tier: s.tier || 1,
+            angle: s.angle || 0,
+            speed: 0.95 + ((s.tier || 1) - 1) * 0.08,
+            radiusOffset: 0
+          }));
+        }
+
+        if (Array.isArray(data.gates) && data.gates.length > 0) {
+          this.gates = data.gates.map(g => {
+            const tier = g.tier || 1;
+            return {
               id: this.nextEntityId++,
-              tier: s.tier || 1,
-              angle: s.angle || 0,
-              speed: 0.95 + ((s.tier || 1) - 1) * 0.08,
-              radiusOffset: 0
-            }));
-          }
+              tier: tier,
+              angle: g.angle || 0,
+              targetAngle: g.angle || 0,
+              multiplier: Math.pow(2, tier - 1),
+              pulse: 0
+            };
+          });
+          this.repositionGates(false);
+        }
 
-          if (Array.isArray(data.gates) && data.gates.length > 0) {
-            this.gates = data.gates.map(g => {
-              const tier = g.tier || 1;
-              return {
-                id: this.nextEntityId++,
-                tier: tier,
-                angle: g.angle || 0,
-                targetAngle: g.angle || 0,
-                multiplier: Math.max(2, g.multiplier || Math.pow(2, tier)),
-                pulse: 0
-              };
-            });
-            this.repositionGates(false);
-          }
-
-          if (data.timestamp) {
-            const elapsedSeconds = Math.min(6 * 3600, (Date.now() - data.timestamp) / 1000);
-            if (elapsedSeconds > 10) {
-              const estRate = this.calculateEstimatedIdleRate();
-              const offlineGain = Math.round(estRate * elapsedSeconds * 0.5);
-              if (offlineGain > 0) {
-                this.coins += offlineGain;
-                this.lifetimeCoins += offlineGain;
-              }
+        if (data.timestamp) {
+          const elapsedSeconds = Math.min(6 * 3600, (Date.now() - data.timestamp) / 1000);
+          if (elapsedSeconds > 10) {
+            const estRate = this.calculateEstimatedIdleRate();
+            const offlineGain = Math.round(estRate * elapsedSeconds * 0.5);
+            if (offlineGain > 0) {
+              this.coins += offlineGain;
+              this.lifetimeCoins += offlineGain;
             }
           }
         }
@@ -698,7 +688,7 @@
       let totalShipValue = 0;
       this.ships.forEach(s => totalShipValue += this.getShipPayout(s.tier));
       let totalGateMult = 0;
-      this.gates.forEach(g => totalGateMult += (g.multiplier || 2));
+      this.gates.forEach(g => totalGateMult += (g.multiplier || 1));
       return Math.round((totalShipValue * totalGateMult) / 6.5);
     }
 
