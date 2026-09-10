@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Orbital Merge & Idle Clicker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app-container">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="balance-container">
+        <span class="currency-icon" id="balance-icon">🪙</span>
+        <div class="balance-details">
+          <span class="balance-amount" id="coin-balance">0</span>
+          <span class="cps-rate" id="cps-rate">+0/s</span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="speed-btn" class="icon-btn" title="Toggle Game Speed">
+          <span class="speed-badge" id="speed-indicator">1x</span>
+        </button>
+        <button id="sound-btn" class="icon-btn" title="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="store-btn" class="cta-store-btn" title="Multiverse Store & Themes">
+          <span class="store-icon">🌌</span>
+          <span class="store-label">STORE</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Progress / Goal Section -->
+    <section class="progress-section">
+      <div class="goal-header">
+        <div class="goal-label-wrapper">
+          <span class="goal-tag">MISSION</span>
+          <span class="goal-text" id="goal-text">GOAL: ADD 20 SPACESHIP (0/20)</span>
+        </div>
+        <span class="goal-reward" id="goal-reward">+100 🪙</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="goal-progress-fill" style="width: 0%;"></div>
+        <div class="progress-glow"></div>
+      </div>
+    </section>
+
+    <!-- Main Play Area (The Orbit) -->
+    <main class="orbit-area">
+      <canvas id="orbitCanvas"></canvas>
+      <div class="orbit-overlay-hint">
+        <span>💡 Drag & drop matching ships to merge them!</span>
+      </div>
+    </main>
+
+    <!-- Bottom Control Panel -->
+    <footer class="bottom-panel">
+      <!-- Merge Button -->
+      <button id="btn-merge" class="control-btn merge-btn" disabled>
+        <div class="btn-icon">⚡</div>
+        <div class="btn-content">
+          <span class="btn-title">MERGE</span>
+          <span class="btn-subtitle" id="merge-status">0/0 Ready</span>
+        </div>
+        <div class="btn-badge" id="merge-badge">0</div>
+      </button>
+
+      <!-- Buy Ship Button -->
+      <button id="btn-buy-ship" class="control-btn green-cta buy-ship-btn">
+        <div class="btn-icon">🚀</div>
+        <div class="btn-content">
+          <span class="btn-title" id="buy-ship-title">+1 SHIP</span>
+          <span class="btn-cost" id="buy-ship-cost">🪙 40</span>
+        </div>
+        <div class="btn-capacity" id="ship-capacity">1/16</div>
+      </button>
+
+      <!-- Buy Gate Button -->
+      <button id="btn-buy-gate" class="control-btn green-cta buy-gate-btn">
+        <div class="btn-icon">🌀</div>
+        <div class="btn-content">
+          <span class="btn-title" id="buy-gate-title">+1 GATE</span>
+          <span class="btn-cost" id="buy-gate-cost">🪙 120</span>
+        </div>
+        <div class="btn-capacity" id="gate-capacity">1/12</div>
+      </button>
+    </footer>
+  </div>
+
+  <!-- Multiverse Store / Themes Modal -->
+  <div id="store-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🌌 Multiverse & Upgrades</h2>
+        <button id="close-modal-btn" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <section class="modal-section">
+          <h3>SELECT THEME</h3>
+          <div class="theme-grid">
+            <!-- Theme 1: Deep Space -->
+            <div class="theme-card active" data-theme="deep-space">
+              <div class="theme-badge">Active</div>
+              <div class="theme-preview space-preview">🚀</div>
+              <h4>Deep Space</h4>
+              <p>Futuristic starships, ionized energy gates, and neon cosmos.</p>
+              <div class="theme-currency">Currency: 🪙 Credits</div>
+            </div>
+
+            <!-- Theme 2: Fantasy Realm -->
+            <div class="theme-card" data-theme="fantasy-realm">
+              <div class="theme-preview fantasy-preview">🐉</div>
+              <h4>Fantasy Realm</h4>
+              <p>Mythical dragons orbiting arcane runic portals and mana wisps.</p>
+              <div class="theme-currency">Currency: 💎 Mana Gems</div>
+            </div>
+
+            <!-- Theme 3: Cyberpunk -->
+            <div class="theme-card" data-theme="cyberpunk">
+              <div class="theme-preview cyber-preview">⚡</div>
+              <h4>Cyberpunk</h4>
+              <p>Data packets traveling high-speed bus lines through security firewalls.</p>
+              <div class="theme-currency">Currency: ⚡ Bitcoins</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>FLEET STATISTICS</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-title">Lifetime Earned</span>
+              <span class="stat-val" id="stat-lifetime">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Gate Passes</span>
+              <span class="stat-val" id="stat-passes">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Total Merges</span>
+              <span class="stat-val" id="stat-merges">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Highest Tier</span>
+              <span class="stat-val" id="stat-tier">Tier 1</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="modal-section dangerous-section">
+          <button id="reset-game-btn" class="danger-btn">⚠️ Reset Game Progress</button>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="src/themes.js"></script>
+  <script src="src/audio.js"></script>
+  <script src="src/game.js"></script>
+  <script src="src/renderer.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
