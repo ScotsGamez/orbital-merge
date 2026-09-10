@@ -40,16 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const goalRewardEl = document.getElementById('goal-reward');
   const goalProgressFill = document.getElementById('goal-progress-fill');
 
-  // DOM Elements - Gate Inspector HUD
-  const gateInspector = document.getElementById('gate-inspector');
-  const inspGateBadge = document.getElementById('insp-gate-badge');
-  const inspGateName = document.getElementById('insp-gate-name');
-  const inspGateMult = document.getElementById('insp-gate-mult');
-  const btnUpgradeGate = document.getElementById('btn-upgrade-selected-gate');
-  const inspGateCost = document.getElementById('insp-gate-cost');
-  const btnMergeGate = document.getElementById('btn-merge-selected-gate');
-  const inspGateMergeStatus = document.getElementById('insp-gate-merge-status');
-  const closeInspectorBtn = document.getElementById('close-inspector-btn');
+
 
   // DOM Elements - Bottom Control Panel
   const btnMergeShips = document.getElementById('btn-merge-ships');
@@ -97,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     balanceIcon.textContent = game.theme.currencySymbol;
 
     updateButtonsState();
-    updateGateInspector();
   }
 
   function updateGoalUI() {
@@ -166,34 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnBuyGate.disabled = !game.canBuyGate();
   }
 
-  function updateGateInspector() {
-    const gate = game.getSelectedGate();
-    if (!gate) {
-      gateInspector.classList.add('hidden');
-      return;
-    }
 
-    gateInspector.classList.remove('hidden');
-    const gateCfg = game.getGateTierConfig(gate.tier);
-    const cost = game.getGateUpgradeCost(gate.id);
-
-    inspGateBadge.textContent = `GATE #${gate.id}`;
-    inspGateName.textContent = `${gateCfg.name} (Tier ${gate.tier})`;
-    inspGateMult.textContent = gate.tier === 1 ? '1x (Base)' : `${gate.multiplier}x`;
-    inspGateCost.textContent = `${game.theme.currencySymbol} ${formatNumber(cost)}`;
-
-    btnUpgradeGate.disabled = !game.canUpgradeGate(gate.id);
-
-    // Check if another gate of identical tier exists to merge
-    const matchingGate = game.gates.find(g => g.id !== gate.id && g.tier === gate.tier);
-    if (matchingGate) {
-      btnMergeGate.disabled = false;
-      inspGateMergeStatus.textContent = `Match with #${matchingGate.id}`;
-    } else {
-      btnMergeGate.disabled = true;
-      inspGateMergeStatus.textContent = 'No Match';
-    }
-  }
 
   function updateThemeUI() {
     const theme = game.theme;
@@ -227,10 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
   game.on('onGoalProgress', () => updateGoalUI());
   game.on('onEntityChange', () => {
     updateButtonsState();
-    updateGateInspector();
   });
   game.on('onThemeChange', () => updateThemeUI());
-  game.on('onGateSelect', () => updateGateInspector());
   game.on('onGoalCompleted', goal => {
     updateGoalUI();
     updateBalanceUI();
@@ -251,29 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnMergeGates.addEventListener('click', () => {
     game.mergeNextGatePair();
-  });
-
-  // Gate Inspector Actions
-  btnUpgradeGate.addEventListener('click', () => {
-    const gate = game.getSelectedGate();
-    if (gate) {
-      game.upgradeGate(gate.id);
-    }
-  });
-
-  btnMergeGate.addEventListener('click', () => {
-    const gate = game.getSelectedGate();
-    if (gate) {
-      const matchingGate = game.gates.find(g => g.id !== gate.id && g.tier === gate.tier);
-      if (matchingGate) {
-        game.mergeGates(gate, matchingGate);
-        game.selectGate(matchingGate.id);
-      }
-    }
-  });
-
-  closeInspectorBtn.addEventListener('click', () => {
-    game.selectGate(null);
   });
 
   // Top Bar Actions
@@ -352,9 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (params.get('store') === '1' || params.get('store') === 'true') {
       updateStatsModal();
       storeModal.classList.remove('hidden');
-    }
-    if (params.get('gate')) {
-      game.selectGate(parseInt(params.get('gate'), 10));
     }
   } catch (e) {}
 

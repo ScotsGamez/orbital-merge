@@ -31,7 +31,6 @@
       this.ships = [];
       this.gates = [];
       this.nextEntityId = 1;
-      this.selectedGateId = null;
 
       // Drag and Drop state
       this.draggedShip = null;
@@ -44,7 +43,7 @@
         { id: 'merge_t2', text: 'MERGE A TIER 2 SHIP', type: 'highest_tier', target: 2, reward: 10 },
         { id: 'buy_gate_2', text: 'ADD 2ND GATE', type: 'gates_count', target: 2, reward: 15 },
         { id: 'earn_50', text: 'REACH 50 COINS', type: 'current_coins', target: 50, reward: 25 },
-        { id: 'merge_gate_t2', text: 'UPGRADE/MERGE A TIER 2 GATE', type: 'highest_gate_tier', target: 2, reward: 50 },
+        { id: 'merge_gate_t2', text: 'MERGE A TIER 2 GATE', type: 'highest_gate_tier', target: 2, reward: 50 },
         { id: 'ships_5', text: 'ADD 5 SPACESHIPS', type: 'ships_count', target: 5, reward: 75 },
         { id: 'merge_t3', text: 'MERGE A TIER 3 SHIP', type: 'highest_tier', target: 3, reward: 150 },
         { id: 'earn_500', text: 'REACH 500 COINS', type: 'current_coins', target: 500, reward: 250 },
@@ -63,8 +62,7 @@
         onGoalCompleted: [],
         onEntityChange: [],
         onThemeChange: [],
-        onGatePass: [],
-        onGateSelect: []
+        onGatePass: []
       };
 
       this.initDefaultEntities();
@@ -369,49 +367,6 @@
       const pair = this.findMergeableGatePair();
       if (!pair) return null;
       return this.mergeGates(pair[0], pair[1]);
-    }
-
-    getGateUpgradeCost(gateId) {
-      const gate = this.gates.find(g => g.id === gateId);
-      if (!gate) return 0;
-      return Math.round(10 * Math.pow(2.2, gate.tier - 1));
-    }
-
-    canUpgradeGate(gateId) {
-      const cost = this.getGateUpgradeCost(gateId);
-      return this.coins >= cost && cost > 0;
-    }
-
-    upgradeGate(gateId) {
-      const gate = this.gates.find(g => g.id === gateId);
-      if (!gate) return false;
-
-      const cost = this.getGateUpgradeCost(gateId);
-      if (this.coins < cost) return false;
-
-      this.coins -= cost;
-      gate.tier++;
-      gate.multiplier = Math.pow(2, gate.tier - 1);
-      gate.pulse = 1.0;
-
-      if (window.OrbitalAudio) {
-        window.OrbitalAudio.playMerge();
-      }
-
-      this.checkGoalProgress();
-      this.emit('onEntityChange');
-      this.emit('onCoinUpdate');
-      this.save();
-      return true;
-    }
-
-    selectGate(id) {
-      this.selectedGateId = id;
-      this.emit('onGateSelect', this.getSelectedGate());
-    }
-
-    getSelectedGate() {
-      return this.gates.find(g => g.id === this.selectedGateId) || null;
     }
 
     getHighestShipTier() {

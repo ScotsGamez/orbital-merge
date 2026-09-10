@@ -32,7 +32,6 @@
       this.dragPos = { x: 0, y: 0 };
       this.hoverTargetShip = null;
       this.isPointerDown = false;
-      this.selectedGate = null;
 
       // Animation loop
       this.lastFrameTime = performance.now();
@@ -330,7 +329,6 @@
 
         const gateCfg = this.game.getGateTierConfig(gate.tier);
         const pulse = gate.pulse || 0;
-        const isSelected = this.game.selectedGateId === gate.id;
 
         ctx.save();
         ctx.translate(gx, gy);
@@ -340,17 +338,6 @@
 
         const beamHalfWidth = 24 + pulse * 6; // Radial distance between pylons
         const pylonDepth = 8; // Tangential thickness of pylons
-
-        // Selection highlight ring if selected
-        if (isSelected) {
-          ctx.strokeStyle = '#ffd700';
-          ctx.lineWidth = 2.5;
-          ctx.setLineDash([3, 3]);
-          ctx.beginPath();
-          ctx.arc(0, 0, beamHalfWidth + 12, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.setLineDash([]);
-        }
 
         // Passing Pulse Flare
         if (pulse > 0.05) {
@@ -790,28 +777,8 @@
       return null;
     }
 
-    findGateNear(x, y, threshold = 32) {
-      const R = this.orbitRadius;
-      for (const gate of this.game.gates) {
-        const gx = this.centerX + Math.cos(gate.angle) * R;
-        const gy = this.centerY + Math.sin(gate.angle) * R;
-        const dist = Math.hypot(x - gx, y - gy);
-        if (dist <= threshold) {
-          return gate;
-        }
-      }
-      return null;
-    }
-
     handlePointerDown(e) {
       const coords = this.getCanvasCoords(e);
-
-      // Check if clicking on a gate
-      const gate = this.findGateNear(coords.x, coords.y);
-      if (gate) {
-        this.game.selectGate(gate.id);
-        return;
-      }
 
       // Check if dragging a ship
       const ship = this.findShipNear(coords.x, coords.y);
@@ -821,9 +788,6 @@
         this.dragPos = coords;
         this.isPointerDown = true;
         this.canvas.setPointerCapture(e.pointerId);
-      } else {
-        // Deselect gate if clicking empty space
-        this.game.selectGate(null);
       }
     }
 

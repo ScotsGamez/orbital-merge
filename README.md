@@ -19,8 +19,7 @@ Inspired by circular track idle merge games and fully customizable across the **
    $$\text{New Cost} = \text{Base Cost} \times 1.15^{\text{Owned Amount}}$$
 3. **Merge & Upgrade**:
    - **Merge Ships**: Combine two identical ships into Tier $N+1$ via the **MERGE SHIPS** button or canvas drag-and-drop.
-   - **Merge Gates**: Combine two identical gates into Tier $N+1$ with double the multiplier via the **MERGE GATES** button.
-   - **Individual Gate Inspector**: Click any gate on the track to open the Gate Inspector HUD card and upgrade it individually.
+   - **Merge Gates**: Combine two identical gates into Tier $N+1$ with double the multiplier via the **MERGE GATES** button at the bottom.
 4. **Mission Goals**: Progressive milestone missions with dynamic progress bars and instant cash bounties.
 
 ---
@@ -52,7 +51,6 @@ Switch themes seamlessly in real-time from the **Store (🌌)** menu:
 - **Mouse / Touch**:
   - Click **+1 SHIP** or **+1 GATE** to purchase.
   - Click **MERGE SHIPS** or **MERGE GATES** to combine matching pairs.
-  - Click on any gate to open the **Gate Inspector** to upgrade or merge it.
   - Drag and drop ships directly onto other ships of identical tier to merge.
 - **Keyboard Shortcuts**:
   - `Space`: Buy +1 Ship

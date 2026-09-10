@@ -254,131 +254,7 @@ html, body {
   touch-action: none;
 }
 
-/* Gate Inspector Floating HUD Card */
-.gate-inspector-card {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  background: rgba(14, 22, 45, 0.92);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--accent-cyan);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px var(--accent-glow);
-  border-radius: 14px;
-  padding: 14px 18px;
-  width: 280px;
-  z-index: 30;
-  transition: all 0.25s ease;
-}
 
-.gate-inspector-card.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-10px) scale(0.95);
-}
-
-.inspector-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-
-.inspector-badge {
-  font-size: 0.65rem;
-  font-weight: 800;
-  background: rgba(0, 240, 255, 0.2);
-  color: var(--accent-cyan);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.inspector-title-group h4 {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-top: 2px;
-}
-
-.close-card-btn {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.3rem;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.close-card-btn:hover {
-  color: #fff;
-}
-
-.inspector-metric {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 6px 10px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-}
-
-.metric-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-}
-
-.metric-val {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 800;
-  color: #ffd700;
-}
-
-.inspector-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.action-btn {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.upgrade-gate-btn {
-  background: linear-gradient(135deg, #057a44, #03522d);
-  border-color: rgba(0, 255, 136, 0.4);
-  color: #fff;
-}
-
-.upgrade-gate-btn:hover:not(:disabled) {
-  border-color: var(--accent-green);
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
-}
-
-.merge-gate-btn {
-  background: linear-gradient(135deg, #2b1f4d, #1e133d);
-  border-color: rgba(176, 38, 255, 0.4);
-  color: #fff;
-}
-
-.merge-gate-btn:hover:not(:disabled) {
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 12px rgba(176, 38, 255, 0.4);
-}
-
-.action-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  filter: grayscale(0.7);
-}
 
 .orbit-overlay-hint {
   position: absolute;
@@ -774,16 +650,6 @@ html, body {
     padding: 2px 5px;
     flex-shrink: 0;
     margin-left: 4px;
-  }
-
-  .gate-inspector-card {
-    right: 12px;
-    left: 12px;
-    width: auto;
-    max-width: 380px;
-    margin: 0 auto;
-    top: 10px;
-    padding: 10px 14px;
   }
 }
 

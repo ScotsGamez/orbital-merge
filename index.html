@@ -54,35 +54,8 @@
     <main class="orbit-area">
       <canvas id="orbitCanvas"></canvas>
       
-      <!-- Gate Inspector HUD Card (Shown when gate is clicked) -->
-      <div id="gate-inspector" class="gate-inspector-card hidden">
-        <div class="inspector-header">
-          <div class="inspector-title-group">
-            <span class="inspector-badge" id="insp-gate-badge">GATE #1</span>
-            <h4 id="insp-gate-name">Alpha Gate (Tier 1)</h4>
-          </div>
-          <button id="close-inspector-btn" class="close-card-btn">&times;</button>
-        </div>
-        <div class="inspector-body">
-          <div class="inspector-metric">
-            <span class="metric-label">Multiplier</span>
-            <span class="metric-val" id="insp-gate-mult">2x</span>
-          </div>
-          <div class="inspector-actions">
-            <button id="btn-upgrade-selected-gate" class="action-btn upgrade-gate-btn">
-              <span>UPGRADE (+1 TIER)</span>
-              <span class="cost-tag" id="insp-gate-cost">🪙 100</span>
-            </button>
-            <button id="btn-merge-selected-gate" class="action-btn merge-gate-btn" disabled>
-              <span>MERGE PAIR</span>
-              <span class="cost-tag" id="insp-gate-merge-status">No Match</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div class="orbit-overlay-hint">
-        <span>💡 Click a gate to upgrade it • Drag ships to merge!</span>
+        <span>💡 Drag ships or use buttons below to merge & multiply!</span>
       </div>
     </main>
 
