@@ -23,6 +23,7 @@ GitHub is the single source of truth for all issue tracking, bug reports, and fe
 
 | Issue | Title | Category | Status | GitHub Link |
 | :--- | :--- | :--- | :--- | :--- |
+| **#14** | **Make a scoreboard of players and top Scores** | `Visuals & Themes` | ✅ **Closed** | [#14 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/14) |
 | **#11** | **Merge Cost: merging ships & gates should cost coins** | `Core Gameplay` | ✅ **Closed** | [#11 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/11) |
 | **#13** | **Gate Upgrade mechanics (unify into MERGE GATES button)** | `Bugfix` | ✅ **Closed** | [#13 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/13) |
 | **#12** | **Per Device screen size & button location (iOS Safari/mobile)** | `Bugfix` | ✅ **Closed** | [#12 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/12) |

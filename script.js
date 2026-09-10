@@ -71,6 +71,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const statMergesEl = document.getElementById('stat-merges');
   const statTierEl = document.getElementById('stat-tier');
 
+  // DOM Elements - Scoreboard Modal
+  const scoreboardBtn = document.getElementById('scoreboard-btn');
+  const scoreboardModal = document.getElementById('scoreboard-modal');
+  const closeScoreboardBtn = document.getElementById('close-scoreboard-btn');
+  const playerAvatarDisplay = document.getElementById('player-avatar-display');
+  const playerDisplayName = document.getElementById('player-display-name');
+  const btnEditName = document.getElementById('btn-edit-name');
+  const playerRankBadge = document.getElementById('player-rank-badge');
+  const playerTierBadge = document.getElementById('player-tier-badge');
+  const playerScoreDisplay = document.getElementById('player-score-display');
+  const callsignEditContainer = document.getElementById('callsign-edit-container');
+  const callsignInput = document.getElementById('callsign-input');
+  const btnSaveCallsign = document.getElementById('btn-save-callsign');
+  const btnCancelCallsign = document.getElementById('btn-cancel-callsign');
+  const rankMotivationBanner = document.getElementById('rank-motivation-banner');
+  const rankMotivationText = document.getElementById('rank-motivation-text');
+  const tabBtnLeaderboard = document.getElementById('tab-btn-leaderboard');
+  const tabBtnRecords = document.getElementById('tab-btn-records');
+  const tabLeaderboard = document.getElementById('tab-leaderboard');
+  const tabRecords = document.getElementById('tab-records');
+  const leaderboardRows = document.getElementById('leaderboard-rows');
+
+  const recHighScore = document.getElementById('rec-high-score');
+  const recLifetimeCoins = document.getElementById('rec-lifetime-coins');
+  const recHighestShip = document.getElementById('rec-highest-ship');
+  const recHighestGate = document.getElementById('rec-highest-gate');
+  const recTotalMerges = document.getElementById('rec-total-merges');
+  const recTotalPasses = document.getElementById('rec-total-passes');
+
   // -------------------------------------------------------------
   // UI UPDATE METHODS
   // -------------------------------------------------------------
@@ -204,19 +233,139 @@ document.addEventListener('DOMContentLoaded', () => {
     statTierEl.textContent = `Tier ${game.getHighestShipTier() || 1}`;
   }
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function updateScoreboardUI() {
+    const lbData = game.getLeaderboard();
+    const records = game.getPersonalRecords();
+
+    // 1. Player Standing Card
+    if (playerAvatarDisplay) {
+      playerAvatarDisplay.textContent = game.theme ? game.theme.icon : '🚀';
+    }
+    if (playerDisplayName) {
+      playerDisplayName.textContent = game.playerName || 'Commander';
+    }
+    if (playerRankBadge) {
+      playerRankBadge.textContent = `Rank #${lbData.playerRank}`;
+      if (lbData.playerRank === 1) {
+        playerRankBadge.textContent = '👑 Rank #1 Champion';
+        playerRankBadge.style.background = 'linear-gradient(135deg, #ffd700, #ffaa00)';
+      } else if (lbData.playerRank <= 3) {
+        playerRankBadge.style.background = 'linear-gradient(135deg, #00f0ff, #00ff88)';
+      } else {
+        playerRankBadge.style.background = 'linear-gradient(135deg, #ffd700, #ff8800)';
+      }
+    }
+    if (playerTierBadge) {
+      playerTierBadge.textContent = `Fleet Tier ${records.highestShipTier}`;
+    }
+    if (playerScoreDisplay) {
+      playerScoreDisplay.textContent = `${formatNumber(lbData.playerScore)} PTS`;
+    }
+
+    // 2. Motivation Banner
+    if (rankMotivationText) {
+      if (lbData.playerRank === 1) {
+        rankMotivationText.textContent = 'You are the Galactic Champion! Unrivaled fleet master!';
+      } else if (lbData.nextRival) {
+        rankMotivationText.textContent = `Only ${formatNumber(lbData.pointsToPassNext)} PTS to pass ${lbData.nextRival.name} (#${lbData.nextRival.rank})!`;
+      } else {
+        rankMotivationText.textContent = 'Earn coins and merge ships to climb the galactic leaderboard!';
+      }
+    }
+
+    // 3. Render Leaderboard Rows
+    if (leaderboardRows) {
+      leaderboardRows.innerHTML = '';
+      lbData.entries.forEach(entry => {
+        const row = document.createElement('div');
+        row.className = `lb-row ${entry.isPlayer ? 'player-row' : ''}`;
+
+        let rankClass = '';
+        let rankLabel = `#${entry.rank}`;
+        if (entry.rank === 1) {
+          rankClass = 'rank-top-1';
+          rankLabel = '👑 1';
+        } else if (entry.rank === 2) {
+          rankClass = 'rank-top-2';
+          rankLabel = '🥈 2';
+        } else if (entry.rank === 3) {
+          rankClass = 'rank-top-3';
+          rankLabel = '🥉 3';
+        }
+
+        row.innerHTML = `
+          <div class="lb-rank ${rankClass}">${rankLabel}</div>
+          <div class="lb-pilot">
+            <span class="lb-avatar">${entry.avatar}</span>
+            <span class="lb-name">${escapeHtml(entry.name)}${entry.isPlayer ? '<span class="you-tag">YOU</span>' : ''}</span>
+          </div>
+          <div class="lb-tier">T${entry.tier}</div>
+          <div class="lb-score">${formatNumber(entry.score)}</div>
+        `;
+        leaderboardRows.appendChild(row);
+      });
+    }
+
+    // 4. Personal Records
+    if (recHighScore) {
+      recHighScore.textContent = `${formatNumber(records.highScore)} PTS`;
+    }
+    if (recLifetimeCoins) {
+      recLifetimeCoins.textContent = `${formatNumber(records.lifetimeCoins)} ${game.theme.currencySymbol}`;
+    }
+    if (recHighestShip) {
+      recHighestShip.textContent = `${records.highestShipName} (T${records.highestShipTier})`;
+    }
+    if (recHighestGate) {
+      recHighestGate.textContent = `${records.highestGateMultiplier} (T${records.highestGateTier})`;
+    }
+    if (recTotalMerges) {
+      recTotalMerges.textContent = formatNumber(records.totalMerges);
+    }
+    if (recTotalPasses) {
+      recTotalPasses.textContent = formatNumber(records.totalPasses);
+    }
+  }
+
   // -------------------------------------------------------------
   // EVENT LISTENERS & BINDINGS
   // -------------------------------------------------------------
 
-  game.on('onCoinUpdate', () => updateBalanceUI());
+  game.on('onCoinUpdate', () => {
+    updateBalanceUI();
+    if (scoreboardModal && !scoreboardModal.classList.contains('hidden')) {
+      updateScoreboardUI();
+    }
+  });
   game.on('onGoalProgress', () => updateGoalUI());
   game.on('onEntityChange', () => {
     updateButtonsState();
+    if (scoreboardModal && !scoreboardModal.classList.contains('hidden')) {
+      updateScoreboardUI();
+    }
   });
-  game.on('onThemeChange', () => updateThemeUI());
+  game.on('onThemeChange', () => {
+    updateThemeUI();
+    if (scoreboardModal && !scoreboardModal.classList.contains('hidden')) {
+      updateScoreboardUI();
+    }
+  });
+  game.on('onScoreboardUpdate', () => {
+    if (scoreboardModal && !scoreboardModal.classList.contains('hidden')) {
+      updateScoreboardUI();
+    }
+  });
   game.on('onGoalCompleted', goal => {
     updateGoalUI();
     updateBalanceUI();
+    if (scoreboardModal && !scoreboardModal.classList.contains('hidden')) {
+      updateScoreboardUI();
+    }
   });
 
   // Buttons - Controls
@@ -284,6 +433,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Scoreboard Modal Actions
+  scoreboardBtn.addEventListener('click', () => {
+    audio.playClick();
+    updateScoreboardUI();
+    scoreboardModal.classList.remove('hidden');
+  });
+
+  closeScoreboardBtn.addEventListener('click', () => {
+    audio.playClick();
+    scoreboardModal.classList.add('hidden');
+    callsignEditContainer.classList.add('hidden');
+  });
+
+  scoreboardModal.addEventListener('click', e => {
+    if (e.target === scoreboardModal) {
+      scoreboardModal.classList.add('hidden');
+      callsignEditContainer.classList.add('hidden');
+    }
+  });
+
+  // Scoreboard Tabs Switching
+  tabBtnLeaderboard.addEventListener('click', () => {
+    audio.playClick();
+    tabBtnLeaderboard.classList.add('active');
+    tabBtnRecords.classList.remove('active');
+    tabLeaderboard.classList.remove('hidden');
+    tabRecords.classList.add('hidden');
+  });
+
+  tabBtnRecords.addEventListener('click', () => {
+    audio.playClick();
+    tabBtnRecords.classList.add('active');
+    tabBtnLeaderboard.classList.remove('active');
+    tabRecords.classList.remove('hidden');
+    tabLeaderboard.classList.add('hidden');
+    updateScoreboardUI();
+  });
+
+  // Callsign Editing
+  btnEditName.addEventListener('click', () => {
+    audio.playClick();
+    callsignEditContainer.classList.toggle('hidden');
+    if (!callsignEditContainer.classList.contains('hidden')) {
+      callsignInput.value = game.playerName || 'Commander';
+      callsignInput.focus();
+    }
+  });
+
+  btnSaveCallsign.addEventListener('click', () => {
+    audio.playClick();
+    const newName = callsignInput.value.trim();
+    if (newName) {
+      game.setPlayerName(newName);
+      updateScoreboardUI();
+    }
+    callsignEditContainer.classList.add('hidden');
+  });
+
+  btnCancelCallsign.addEventListener('click', () => {
+    audio.playClick();
+    callsignEditContainer.classList.add('hidden');
+  });
+
+  callsignInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      btnSaveCallsign.click();
+    } else if (e.key === 'Escape') {
+      btnCancelCallsign.click();
+    }
+  });
+
   // Theme Switching
   themeCards.forEach(card => {
     card.addEventListener('click', () => {
@@ -323,6 +543,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!storeModal.classList.contains('hidden')) {
         updateStatsModal();
       }
+    } else if (e.key === 'l' || e.key === 'L') {
+      scoreboardModal.classList.toggle('hidden');
+      if (!scoreboardModal.classList.contains('hidden')) {
+        updateScoreboardUI();
+      }
+    } else if (e.key === 'Escape') {
+      storeModal.classList.add('hidden');
+      scoreboardModal.classList.add('hidden');
+      callsignEditContainer.classList.add('hidden');
     }
   });
 
@@ -336,6 +565,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (params.get('store') === '1' || params.get('store') === 'true') {
       updateStatsModal();
       storeModal.classList.remove('hidden');
+    }
+    if (params.get('scoreboard') === '1' || params.get('leaderboard') === '1') {
+      updateScoreboardUI();
+      scoreboardModal.classList.remove('hidden');
     }
   } catch (e) {}
 

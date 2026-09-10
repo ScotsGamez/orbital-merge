@@ -52,13 +52,25 @@ Switch themes seamlessly in real-time from the **Store (🌌)** menu:
   - Click **+1 SHIP** or **+1 GATE** to purchase.
   - Click **MERGE SHIPS** or **MERGE GATES** to combine matching pairs.
   - Drag and drop ships directly onto other ships of identical tier to merge.
+  - Click **🏆** to open the Galactic Scoreboard & Fleet Records.
 - **Keyboard Shortcuts**:
   - `Space`: Buy +1 Ship
   - `G`: Buy +1 Gate
   - `M`: Merge lowest matching ship pair
   - `S`: Open / Close Multiverse Store & Stats modal
+  - `L`: Open / Close Galactic Scoreboard modal
+  - `Esc`: Close any open modal
 
 ---
+
+## 🏆 Galactic Scoreboard & Leaderboard
+
+Compete against galactic commanders across the cosmos in the dynamic leaderboard:
+- **Orbital Score Calculation**:
+  $$\text{Score} = \text{Lifetime Currency} + (\text{Ship Tier} - 1) \times 1,000 + (\text{Gate Tier} - 1) \times 2,500 + (\text{Merges} \times 100) + (\text{Gate Passes} \times 2)$$
+- **Dynamic Galactic Rivals**: 12 cosmic pilots (e.g. *Nova Prime*, *Vortex Sovereign*, *Cyber Valkyrie*) with tiered fleets. Your rank updates in real-time as you expand and merge!
+- **Callsign Customization**: Click the ✏️ icon in the scoreboard to personalize your commander name.
+- **Fleet Records**: Track your all-time high score, highest ship tier, peak gate multiplier, and lifetime statistics.
 
 ## 🛠️ Tech Stack & Architecture
 

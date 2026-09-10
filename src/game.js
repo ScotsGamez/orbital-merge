@@ -21,6 +21,8 @@
       this.lastSaveTime = Date.now();
       this.coinsPerSecond = 0;
       this.recentEarnings = [];
+      this.highScore = 0;
+      this.playerName = 'Commander';
 
       // Base Economy Constants: Ship Level 1 starts with 1 coin!
       this.BASE_SHIP_COST = 1;
@@ -411,6 +413,121 @@
       return Math.max(...this.gates.map(g => g.tier));
     }
 
+    // -------------------------------------------------------------
+    // SCOREBOARD & LEADERBOARD SYSTEM
+    // -------------------------------------------------------------
+
+    setPlayerName(name) {
+      if (!name || typeof name !== 'string') return;
+      const clean = name.trim().slice(0, 16);
+      if (clean.length > 0) {
+        this.playerName = clean;
+        try {
+          localStorage.setItem('orbital_merge_player_name', clean);
+        } catch (e) {}
+        this.save();
+        this.emit('onScoreboardUpdate');
+      }
+    }
+
+    calculateScore() {
+      const shipTier = this.getHighestShipTier();
+      const gateTier = this.getHighestGateTier();
+      const shipTierBonus = Math.max(0, shipTier - 1) * 1000;
+      const gateTierBonus = Math.max(0, gateTier - 1) * 2500;
+      const mergeBonus = this.totalMerges * 100;
+      const passBonus = this.totalPasses * 2;
+      const coinsScore = Math.floor(this.lifetimeCoins);
+      const currentScore = coinsScore + shipTierBonus + gateTierBonus + mergeBonus + passBonus;
+      if (currentScore > this.highScore) {
+        this.highScore = currentScore;
+      }
+      return currentScore;
+    }
+
+    getGalacticRivals() {
+      return [
+        { id: 'rival_1', name: 'Nova Prime', avatar: '👑', tier: 8, baseScore: 10000000 },
+        { id: 'rival_2', name: 'Vortex Sovereign', avatar: '🌀', tier: 7, baseScore: 3500000 },
+        { id: 'rival_3', name: 'Cyber Valkyrie', avatar: '⚡', tier: 6, baseScore: 1000000 },
+        { id: 'rival_4', name: 'Quantum Wraith', avatar: '🛰️', tier: 5, baseScore: 350000 },
+        { id: 'rival_5', name: 'Solaris Fox', avatar: '☀️', tier: 5, baseScore: 120000 },
+        { id: 'rival_6', name: 'Chrono Nomad', avatar: '⏱️', tier: 4, baseScore: 45000 },
+        { id: 'rival_7', name: 'Astro Phantom', avatar: '🌌', tier: 4, baseScore: 15000 },
+        { id: 'rival_8', name: 'Nebula Strider', avatar: '🚀', tier: 3, baseScore: 5000 },
+        { id: 'rival_9', name: 'Orbital Scout', avatar: '🛸', tier: 2, baseScore: 1800 },
+        { id: 'rival_10', name: 'Cadet Spark', avatar: '👾', tier: 2, baseScore: 600 },
+        { id: 'rival_11', name: 'Rookie Glider', avatar: '🚀', tier: 1, baseScore: 180 },
+        { id: 'rival_12', name: 'Star Trainee', avatar: '🛰️', tier: 1, baseScore: 40 }
+      ];
+    }
+
+    getLeaderboard() {
+      const playerScore = this.calculateScore();
+      const rivals = this.getGalacticRivals().map(r => ({
+        id: r.id,
+        name: r.name,
+        avatar: r.avatar,
+        tier: r.tier,
+        score: r.baseScore,
+        isPlayer: false
+      }));
+
+      const playerEntry = {
+        id: 'player',
+        name: this.playerName || 'Commander',
+        avatar: (this.theme && this.theme.icon) ? this.theme.icon : '🚀',
+        tier: this.getHighestShipTier() || 1,
+        score: playerScore,
+        isPlayer: true
+      };
+
+      const all = [...rivals, playerEntry];
+      all.sort((a, b) => b.score - a.score);
+
+      let playerRank = 1;
+      let nextRival = null;
+
+      all.forEach((entry, idx) => {
+        entry.rank = idx + 1;
+        if (entry.isPlayer) {
+          playerRank = entry.rank;
+          if (idx > 0) {
+            nextRival = all[idx - 1];
+          }
+        }
+      });
+
+      return {
+        entries: all,
+        playerRank,
+        playerScore,
+        totalRanks: all.length,
+        nextRival,
+        pointsToPassNext: nextRival ? Math.max(1, nextRival.score - playerScore + 1) : 0
+      };
+    }
+
+    getPersonalRecords() {
+      const highestShipTier = this.getHighestShipTier() || 1;
+      const highestGateTier = this.getHighestGateTier() || 1;
+      const shipConfig = this.getShipTierConfig(highestShipTier);
+      const gateConfig = (this.theme && this.theme.gateTiers) ? this.theme.gateTiers.find(g => g.tier === highestGateTier) : null;
+      const gateMult = gateConfig ? `${gateConfig.multiplier}x` : `${Math.pow(2, highestGateTier - 1)}x`;
+
+      return {
+        highScore: Math.max(this.highScore, this.calculateScore()),
+        lifetimeCoins: this.lifetimeCoins,
+        highestShipTier: highestShipTier,
+        highestShipName: shipConfig ? shipConfig.name : `Tier ${highestShipTier}`,
+        highestGateTier: highestGateTier,
+        highestGateMultiplier: gateMult,
+        totalMerges: this.totalMerges,
+        totalPasses: this.totalPasses,
+        playerName: this.playerName || 'Commander'
+      };
+    }
+
     getCurrentGoal() {
       if (this.goalIndex < this.goals.length) {
         return this.goals[this.goalIndex];
@@ -593,6 +710,8 @@
         shipsBought: this.shipsBought,
         gatesBought: this.gatesBought,
         goalIndex: this.goalIndex,
+        highScore: this.highScore,
+        playerName: this.playerName,
         ships: this.ships.map(s => ({ tier: s.tier, angle: s.angle })),
         gates: this.gates.map(g => ({ tier: g.tier, angle: g.angle, multiplier: g.multiplier })),
         timestamp: this.lastSaveTime
@@ -607,6 +726,10 @@
       try {
         const raw = localStorage.getItem('orbital_merge_save_v1');
         if (!raw) {
+          try {
+            const storedName = localStorage.getItem('orbital_merge_player_name');
+            if (storedName) this.playerName = storedName;
+          } catch (e) {}
           this.applyThemeStyles();
           return;
         }
@@ -626,6 +749,13 @@
         this.shipsBought = data.shipsBought || 0;
         this.gatesBought = data.gatesBought || 0;
         this.goalIndex = data.goalIndex || 0;
+        this.highScore = data.highScore || 0;
+        this.playerName = data.playerName || 'Commander';
+
+        try {
+          const storedName = localStorage.getItem('orbital_merge_player_name');
+          if (storedName) this.playerName = storedName;
+        } catch (e) {}
 
         if (Array.isArray(data.ships) && data.ships.length > 0) {
           this.ships = data.ships.map(s => ({

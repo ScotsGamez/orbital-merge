@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Orbital Merge & Idle Clicker</title>
-  <link rel="stylesheet" href="style.css?v=2.2.0">
+  <link rel="stylesheet" href="style.css?v=2.3.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -27,6 +27,9 @@
         </button>
         <button id="sound-btn" class="icon-btn" title="Toggle Sound">
           <span id="sound-icon">🔊</span>
+        </button>
+        <button id="scoreboard-btn" class="icon-btn scoreboard-btn" title="Galactic Scoreboard & Leaderboard (L)">
+          <span class="scoreboard-icon">🏆</span>
         </button>
         <button id="store-btn" class="cta-store-btn" title="Multiverse Store & Themes">
           <span class="store-icon">🌌</span>
@@ -166,13 +169,131 @@
       </div>
     </div>
   </div>
+
+  <!-- Galactic Scoreboard & Leaderboard Modal -->
+  <div id="scoreboard-modal" class="modal-overlay hidden">
+    <div class="modal-content scoreboard-modal-content">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h2>🏆 Galactic Scoreboard</h2>
+          <span class="modal-subtitle">Galactic Rankings & Fleet Records</span>
+        </div>
+        <button id="close-scoreboard-btn" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Player Standing Card -->
+        <div class="player-rank-card">
+          <div class="player-rank-left">
+            <div class="player-avatar-badge" id="player-avatar-display">🚀</div>
+            <div class="player-identity">
+              <div class="player-name-row">
+                <span class="player-name-label" id="player-display-name">Commander</span>
+                <button id="btn-edit-name" class="edit-name-btn" title="Edit Callsign">✏️</button>
+              </div>
+              <div class="player-rank-info">
+                <span class="rank-pill" id="player-rank-badge">Rank #13</span>
+                <span class="tier-pill" id="player-tier-badge">Fleet Tier 1</span>
+              </div>
+            </div>
+          </div>
+          <div class="player-rank-right">
+            <span class="player-score-title">ORBITAL SCORE</span>
+            <span class="player-score-val" id="player-score-display">0 PTS</span>
+          </div>
+        </div>
+
+        <!-- Name Edit Form (Hidden by default) -->
+        <div class="callsign-edit-bar hidden" id="callsign-edit-container">
+          <input type="text" id="callsign-input" maxlength="16" placeholder="Enter Callsign (max 16 chars)" autocomplete="off" />
+          <button id="btn-save-callsign" class="save-callsign-btn">Save</button>
+          <button id="btn-cancel-callsign" class="cancel-callsign-btn">Cancel</button>
+        </div>
+
+        <!-- Motivation Banner -->
+        <div class="rank-motivation-banner" id="rank-motivation-banner">
+          <span class="motivation-icon">🔥</span>
+          <span class="motivation-text" id="rank-motivation-text">Earn coins and merge ships to climb the galactic leaderboard!</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="scoreboard-tabs">
+          <button class="sb-tab active" id="tab-btn-leaderboard" data-tab="leaderboard">🏆 Galactic Leaderboard</button>
+          <button class="sb-tab" id="tab-btn-records" data-tab="records">📊 Fleet Records</button>
+        </div>
+
+        <!-- Tab 1: Leaderboard -->
+        <div class="tab-pane active" id="tab-leaderboard">
+          <div class="leaderboard-table-container">
+            <div class="lb-table-header">
+              <span class="col-rank">RANK</span>
+              <span class="col-pilot">COMMANDER</span>
+              <span class="col-tier">TIER</span>
+              <span class="col-score">SCORE</span>
+            </div>
+            <div class="lb-table-body" id="leaderboard-rows">
+              <!-- Dynamically populated rows -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Records -->
+        <div class="tab-pane hidden" id="tab-records">
+          <div class="records-grid">
+            <div class="record-card">
+              <span class="record-icon">🏆</span>
+              <div class="record-details">
+                <span class="record-title">All-Time High Score</span>
+                <span class="record-val" id="rec-high-score">0 PTS</span>
+              </div>
+            </div>
+            <div class="record-card">
+              <span class="record-icon">🪙</span>
+              <div class="record-details">
+                <span class="record-title">Lifetime Currency</span>
+                <span class="record-val" id="rec-lifetime-coins">0</span>
+              </div>
+            </div>
+            <div class="record-card">
+              <span class="record-icon">🚀</span>
+              <div class="record-details">
+                <span class="record-title">Highest Ship Tier</span>
+                <span class="record-val" id="rec-highest-ship">Tier 1</span>
+              </div>
+            </div>
+            <div class="record-card">
+              <span class="record-icon">⛩️</span>
+              <div class="record-details">
+                <span class="record-title">Highest Gate Multiplier</span>
+                <span class="record-val" id="rec-highest-gate">1x</span>
+              </div>
+            </div>
+            <div class="record-card">
+              <span class="record-icon">⚡</span>
+              <div class="record-details">
+                <span class="record-title">Total Merges Performed</span>
+                <span class="record-val" id="rec-total-merges">0</span>
+              </div>
+            </div>
+            <div class="record-card">
+              <span class="record-icon">🌀</span>
+              <div class="record-details">
+                <span class="record-title">Total Gate Passes</span>
+                <span class="record-val" id="rec-total-passes">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   </div><!-- /#app-container -->
 
   <!-- Scripts -->
-  <script src="src/themes.js?v=2.2.0"></script>
-  <script src="src/audio.js?v=2.2.0"></script>
-  <script src="src/game.js?v=2.2.0"></script>
-  <script src="src/renderer.js?v=2.2.0"></script>
-  <script src="script.js?v=2.2.0"></script>
+  <script src="src/themes.js?v=2.3.0"></script>
+  <script src="src/audio.js?v=2.3.0"></script>
+  <script src="src/game.js?v=2.3.0"></script>
+  <script src="src/renderer.js?v=2.3.0"></script>
+  <script src="script.js?v=2.3.0"></script>
 </body>
 </html>
