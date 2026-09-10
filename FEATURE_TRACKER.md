@@ -12,7 +12,8 @@ GitHub is the single source of truth for all issue tracking, bug reports, and fe
 
 | Issue | Title | Category | Status | GitHub Link |
 | :--- | :--- | :--- | :--- | :--- |
-| **#7** | **Prestige / Quantum Reset system** | `Gameplay & Progression` | 💡 **Open** | [#7 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/7) |
+| **#11** | **Merge Cost: merging ships & gates should cost coins** | `Core Gameplay` | 💡 **Open** | [#11 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/11) |
+| **#7** | **Prestige / Quantum Reset system** | `Progression` | 💡 **Open** | [#7 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/7) |
 | **#8** | **Orbital Superchargers (booster nodes)** | `Active Clicker` | 💡 **Open** | [#8 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/8) |
 | **#9** | **Ambient soundtrack & synth audio toggle** | `Audio & Music` | 💡 **Open** | [#9 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/9) |
 | **#10** | **Specialized gate types (Gravity Wells, Prism)** | `Core Gameplay` | 💡 **Open** | [#10 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/10) |
@@ -23,6 +24,8 @@ GitHub is the single source of truth for all issue tracking, bug reports, and fe
 
 | Issue | Title | Category | Status | GitHub Link |
 | :--- | :--- | :--- | :--- | :--- |
+| **#13** | **Gate Upgrade mechanics (unify into MERGE GATES button)** | `Bugfix` | ✅ **Closed** | [#13 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/13) |
+| **#12** | **Per Device screen size & button location (iOS Safari/mobile)** | `Bugfix` | ✅ **Closed** | [#12 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/12) |
 | **#1** | **Rotate gates across orbital line** | `Visual Polish` | ✅ **Closed** | [#1 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/1) |
 | **#2** | **Remove rocket emoji from center core** | `Visual Polish` | ✅ **Closed** | [#2 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/2) |
 | **#3** | **Gate multiplier scaling: eliminate 1x base** | `Game Balance` | ✅ **Closed** | [#3 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/3) |
