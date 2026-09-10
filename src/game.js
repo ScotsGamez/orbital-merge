@@ -469,8 +469,8 @@
       const playerScore = this.calculateScore();
 
       // Check if real global scores from Firebase are available
-      if (window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig() && window.OrbitalScoreboardService.cachedScores.length > 0) {
-        const realScores = window.OrbitalScoreboardService.cachedScores;
+      if (window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig()) {
+        const realScores = window.OrbitalScoreboardService.cachedScores || [];
         const myPlayerId = window.OrbitalScoreboardService.playerId;
         const hasPlayer = realScores.some(s => s.isPlayer || s.id === myPlayerId);
         let all = [...realScores];
@@ -482,6 +482,21 @@
             tier: this.getHighestShipTier() || 1,
             score: playerScore,
             isPlayer: true
+          });
+          all.sort((a, b) => b.score - a.score);
+        } else {
+          all = all.map(entry => {
+            if (entry.id === myPlayerId || entry.isPlayer) {
+              return {
+                ...entry,
+                name: this.playerName || entry.name,
+                avatar: (this.theme && this.theme.icon) ? this.theme.icon : entry.avatar,
+                score: Math.max(entry.score, playerScore),
+                tier: Math.max(entry.tier || 1, this.getHighestShipTier() || 1),
+                isPlayer: true
+              };
+            }
+            return entry;
           });
           all.sort((a, b) => b.score - a.score);
         }

@@ -8,8 +8,8 @@
   // Default Firebase configuration
   // When Scotland sets up their Firebase project, the databaseURL goes here.
   const DEFAULT_FIREBASE_CONFIG = {
-    databaseURL: '', // e.g. "https://orbital-merge-default-rtdb.firebaseio.com"
-    projectId: ''
+    databaseURL: 'https://orbital-merge-default-rtdb.firebaseio.com',
+    projectId: 'orbital-merge'
   };
 
   class ScoreboardService {
@@ -167,10 +167,14 @@
       this.lastSubmitTime = now;
       this.lastSubmitScore = score;
 
+      const existingEntry = this.cachedScores.find(s => s.id === this.playerId);
+      const bestScore = existingEntry ? Math.max(existingEntry.score, Math.floor(score)) : Math.floor(score);
+      const bestTier = existingEntry ? Math.max(existingEntry.tier || 1, tier || 1) : (tier || 1);
+
       const payload = {
         name: String(playerName || 'Commander').slice(0, 16),
-        score: Math.floor(score),
-        tier: tier,
+        score: bestScore,
+        tier: bestTier,
         avatar: avatar,
         timestamp: now
       };

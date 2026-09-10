@@ -283,7 +283,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Motivation Banner
     if (rankMotivationText) {
       if (lbData.playerRank === 1) {
-        rankMotivationText.textContent = 'You are the Galactic Champion! Unrivaled fleet master!';
+        if (lbData.totalRanks === 1) {
+          rankMotivationText.textContent = '👑 You hold Rank #1! Share with friends to compete on your live board!';
+        } else {
+          rankMotivationText.textContent = '👑 You are the Galactic Champion! Unrivaled fleet master!';
+        }
       } else if (lbData.nextRival) {
         rankMotivationText.textContent = `Only ${formatNumber(lbData.pointsToPassNext)} PTS to pass ${lbData.nextRival.name} (#${lbData.nextRival.rank})!`;
       } else {
@@ -450,7 +454,11 @@ document.addEventListener('DOMContentLoaded', () => {
   scoreboardBtn.addEventListener('click', () => {
     audio.playClick();
     if (window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig()) {
-      window.OrbitalScoreboardService.fetchGlobalScores().catch(() => {});
+      window.OrbitalScoreboardService.fetchGlobalScores().then(() => {
+        if (scoreboardModal && !scoreboardModal.classList.contains('hidden')) {
+          updateScoreboardUI();
+        }
+      }).catch(() => {});
     }
     updateScoreboardUI();
     scoreboardModal.classList.remove('hidden');
@@ -570,6 +578,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (e.key === 'l' || e.key === 'L') {
       scoreboardModal.classList.toggle('hidden');
       if (!scoreboardModal.classList.contains('hidden')) {
+        if (window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig()) {
+          window.OrbitalScoreboardService.fetchGlobalScores().then(() => {
+            if (!scoreboardModal.classList.contains('hidden')) {
+              updateScoreboardUI();
+            }
+          }).catch(() => {});
+        }
         updateScoreboardUI();
       }
     } else if (e.key === 'Escape') {
@@ -591,6 +606,13 @@ document.addEventListener('DOMContentLoaded', () => {
       storeModal.classList.remove('hidden');
     }
     if (params.get('scoreboard') === '1' || params.get('leaderboard') === '1') {
+      if (window.OrbitalScoreboardService && window.OrbitalScoreboardService.hasValidConfig()) {
+        window.OrbitalScoreboardService.fetchGlobalScores().then(() => {
+          if (scoreboardModal && !scoreboardModal.classList.contains('hidden')) {
+            updateScoreboardUI();
+          }
+        }).catch(() => {});
+      }
       updateScoreboardUI();
       scoreboardModal.classList.remove('hidden');
     }

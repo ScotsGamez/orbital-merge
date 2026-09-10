@@ -63,12 +63,13 @@ Switch themes seamlessly in real-time from the **Store (🌌)** menu:
 
 ---
 
-## 🏆 Galactic Scoreboard & Leaderboard
+## 🏆 Galactic Scoreboard & Real Global Leaderboard
 
-Compete against galactic commanders across the cosmos in the dynamic leaderboard:
+Compete against actual visitors across the globe powered by **Google Firebase Realtime Database**:
+- **Real Visitor Tracking**: Every player who visits your site receives a unique anonymous pilot ID. High scores, commander callsigns, and fleet tiers automatically sync to Firebase in real-time.
 - **Orbital Score Calculation**:
   $$\text{Score} = \text{Lifetime Currency} + (\text{Ship Tier} - 1) \times 1,000 + (\text{Gate Tier} - 1) \times 2,500 + (\text{Merges} \times 100) + (\text{Gate Passes} \times 2)$$
-- **Dynamic Galactic Rivals**: 12 cosmic pilots (e.g. *Nova Prime*, *Vortex Sovereign*, *Cyber Valkyrie*) with tiered fleets. Your rank updates in real-time as you expand and merge!
+- **Live Sync Badge**: Real-time status indicator (`🟢 Real Players Live`) showing live connectivity to Google Firebase.
 - **Callsign Customization**: Click the ✏️ icon in the scoreboard to personalize your commander name.
 - **Fleet Records**: Track your all-time high score, highest ship tier, peak gate multiplier, and lifetime statistics.
 
