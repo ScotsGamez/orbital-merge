@@ -5,6 +5,18 @@
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
+  // Dynamic Viewport Height calculation for iOS Safari & mobile browsers
+  function updateViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+  window.addEventListener('resize', updateViewportHeight);
+  window.addEventListener('orientationchange', updateViewportHeight);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateViewportHeight);
+  }
+  updateViewportHeight();
+
   const game = window.OrbitalGame;
   const audio = window.OrbitalAudio;
   const canvas = document.getElementById('orbitCanvas');
@@ -147,8 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Buy Gate Button
     const gateCost = game.getGateCost();
+    const isNarrow = window.innerWidth <= 768;
     buyGateCostEl.textContent = `${game.theme.currencySymbol} ${formatNumber(gateCost)}`;
-    buyGateTitleEl.textContent = `+1 ${game.theme.gateName.toUpperCase()}`;
+    buyGateTitleEl.textContent = isNarrow ? '+1 GATE' : `+1 ${game.theme.gateName.toUpperCase()}`;
     gateCapacityEl.textContent = `${game.gates.length}/${game.maxGatesCapacity}`;
     btnBuyGate.disabled = !game.canBuyGate();
   }
@@ -339,6 +352,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (params.get('store') === '1' || params.get('store') === 'true') {
       updateStatsModal();
       storeModal.classList.remove('hidden');
+    }
+    if (params.get('gate')) {
+      game.selectGate(parseInt(params.get('gate'), 10));
     }
   } catch (e) {}
 

@@ -30,26 +30,37 @@
 html, body {
   width: 100%;
   height: 100%;
+  height: -webkit-fill-available;
+  height: 100dvh;
   overflow: hidden;
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-main);
   transition: background-color 0.4s ease;
+  position: fixed;
+  left: 0;
+  top: 0;
 }
 
 #app-container {
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  height: 100dvh;
   position: relative;
   overflow: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 /* -------------------------------------------------------------
    TOP BAR
    ------------------------------------------------------------- */
 .top-bar {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -157,6 +168,7 @@ html, body {
    PROGRESS / GOAL SECTION
    ------------------------------------------------------------- */
 .progress-section {
+  flex-shrink: 0;
   padding: 10px 20px;
   background: rgba(10, 14, 28, 0.6);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -225,7 +237,9 @@ html, body {
    MAIN PLAY AREA (THE ORBIT)
    ------------------------------------------------------------- */
 .orbit-area {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -237,6 +251,7 @@ html, body {
   width: 100%;
   height: 100%;
   display: block;
+  touch-action: none;
 }
 
 /* Gate Inspector Floating HUD Card */
@@ -390,10 +405,12 @@ html, body {
    BOTTOM CONTROL PANEL (4 BUTTONS)
    ------------------------------------------------------------- */
 .bottom-panel {
+  flex-shrink: 0;
   display: grid;
   grid-template-columns: 1fr 1fr 1.2fr 1.2fr;
   gap: 10px;
-  padding: 12px 18px 16px;
+  padding: 12px 18px;
+  padding-bottom: max(14px, calc(10px + env(safe-area-inset-bottom, 0px)));
   background: var(--card-bg);
   backdrop-filter: blur(14px);
   border-top: 1px solid var(--card-border);
@@ -555,6 +572,7 @@ html, body {
   width: 90%;
   max-width: 580px;
   max-height: 85vh;
+  max-height: 85dvh;
   overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
   display: flex;
@@ -717,29 +735,169 @@ html, body {
 }
 
 /* -------------------------------------------------------------
-   RESPONSIVE LAYOUT
+   RESPONSIVE LAYOUT (MOBILE & TABLET OPTIMIZATIONS)
    ------------------------------------------------------------- */
 @media (max-width: 768px) {
   .bottom-panel {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    padding: 10px 12px 14px;
+    padding: 8px 12px;
+    padding-bottom: max(12px, calc(8px + env(safe-area-inset-bottom, 0px)));
   }
+
+  .control-btn {
+    padding: 8px 10px;
+    min-height: 48px;
+  }
+
+  .btn-icon {
+    font-size: 1.25rem;
+  }
+
+  .btn-content {
+    margin-left: 6px;
+    min-width: 0;
+  }
+
+  .btn-title {
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-subtitle, .btn-cost {
+    font-size: 0.7rem;
+  }
+
+  .btn-capacity, .btn-badge {
+    font-size: 0.65rem;
+    padding: 2px 5px;
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+
   .gate-inspector-card {
-    right: 10px;
-    left: 10px;
+    right: 12px;
+    left: 12px;
     width: auto;
+    max-width: 380px;
+    margin: 0 auto;
+    top: 10px;
+    padding: 10px 14px;
   }
 }
 
 @media (max-width: 480px) {
   .top-bar {
-    padding: 8px 10px;
+    padding: 6px 10px;
   }
+
+  .currency-icon {
+    font-size: 1.6rem;
+  }
+
+  .balance-amount {
+    font-size: 1.25rem;
+  }
+
+  .cps-rate {
+    font-size: 0.72rem;
+  }
+
   .store-label {
     display: none;
   }
-  .balance-amount {
-    font-size: 1.25rem;
+
+  .cta-store-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .icon-btn {
+    min-width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .progress-section {
+    padding: 6px 10px;
+  }
+
+  .goal-text {
+    font-size: 0.75rem;
+  }
+
+  .goal-reward {
+    font-size: 0.72rem;
+    padding: 1px 6px;
+  }
+
+  .progress-bar-container {
+    height: 6px;
+  }
+
+  .bottom-panel {
+    gap: 6px;
+    padding: 6px 8px;
+    padding-bottom: max(10px, calc(6px + env(safe-area-inset-bottom, 0px)));
+  }
+
+  .control-btn {
+    padding: 6px 8px;
+    min-height: 44px;
+    border-radius: 10px;
+  }
+
+  .btn-icon {
+    font-size: 1.15rem;
+  }
+
+  .btn-title {
+    font-size: 0.74rem;
+  }
+
+  .btn-subtitle, .btn-cost {
+    font-size: 0.65rem;
+  }
+
+  .btn-capacity, .btn-badge {
+    font-size: 0.62rem;
+    padding: 2px 4px;
+  }
+
+  .orbit-overlay-hint {
+    font-size: 0.68rem;
+    padding: 4px 10px;
+    bottom: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .bottom-panel {
+    gap: 4px;
+    padding: 4px 6px;
+    padding-bottom: max(8px, calc(4px + env(safe-area-inset-bottom, 0px)));
+  }
+
+  .control-btn {
+    padding: 5px 6px;
+    min-height: 40px;
+  }
+
+  .btn-icon {
+    font-size: 1rem;
+  }
+
+  .btn-title {
+    font-size: 0.7rem;
+  }
+
+  .btn-subtitle, .btn-cost {
+    font-size: 0.6rem;
+  }
+
+  .btn-capacity, .btn-badge {
+    font-size: 0.58rem;
+    padding: 1px 3px;
   }
 }
