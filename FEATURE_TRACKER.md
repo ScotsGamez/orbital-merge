@@ -1,10 +1,20 @@
 # 📋 Orbital Merge - Issue & Feature Tracker
 
-This document serves as the project's central issue board and idea backlog. You can log new feature requests, bug reports, and balance suggestions here or directly in the in-game **Tracker (📋)** modal.
+This document serves as the project's central roadmap and idea backlog. All issues and feature requests are tracked directly on GitHub using native GitHub Issue Forms.
 
 ---
 
-## 🚀 Active Feature & Issue Board
+## 🔗 Submit an Issue on GitHub
+
+To request a new feature or report a bug, use the interactive GitHub Issue forms:
+
+- 💡 **[Submit Feature Request](https://github.com/ScotsGamez/orbital-merge/issues/new?template=feature_request.yml)** — Propose new game mechanics, balance changes, visual themes, or sound effects.
+- 🐛 **[Report a Bug](https://github.com/ScotsGamez/orbital-merge/issues/new?template=bug_report.yml)** — Report gameplay glitches, calculation errors, or display anomalies.
+- 📋 **[View All GitHub Issues](https://github.com/ScotsGamez/orbital-merge/issues)** — Browse open and closed issues.
+
+---
+
+## 🚀 Resolved Features & Change Log
 
 | ID | Title | Type | Status | Description |
 | :--- | :--- | :--- | :--- | :--- |
@@ -12,25 +22,8 @@ This document serves as the project's central issue board and idea backlog. You 
 | **#2** | **Remove rocket emoji from center core** | `Visual Polish` | ✅ **Resolved** | Replaced emoji with a high-tech sci-fi pulsating energy singularity with dual counter-rotating tech rings. |
 | **#3** | **Gate multiplier scaling: eliminate 1x** | `Game Balance` | ✅ **Resolved** | Upgraded gate multipliers to start at 2x base and scale by powers of 2 (2x, 4x, 8x, 16x...) so payouts are mathematically meaningful. |
 | **#4** | **Gate merging and individual gate upgrading** | `Feature Request` | ✅ **Resolved** | Added direct gate click inspection HUD for individual gate upgrades and a dedicated `MERGE GATES` button to combine identical gate tiers. |
-| **#5** | **Interactive GitHub Issue & Feature Tracker** | `Feature Request` | ✅ **Resolved** | Built in-game tracker modal with localStorage persistence, Markdown export for GitHub, and repository tracker board. |
+| **#5** | **GitHub Issue & Feature Tracking** | `Feature Request` | ✅ **Resolved** | Configured structured GitHub Issue Forms (`.github/ISSUE_TEMPLATE/`) for direct 1-click submission on GitHub. |
 | **#6** | **Ship Level 1 starts with 1 coin economy & scaling** | `Game Balance` | ✅ **Resolved** | Configured Level 1 ship base payout to 1 coin and base cost to 1 coin, with smooth exponential pacing for tiers, gates, and missions. |
-
----
-
-## 📝 How to Submit New Ideas & Bugs
-
-### Option 1: In-Game Tracker (Recommended)
-1. Open the game in your browser.
-2. Click the **📋 TRACKER** button in the top bar (or press `T` on your keyboard).
-3. Fill in your Title, Category, and Description, then click **Submit to Tracker**.
-4. The issue will be saved to your local storage and you can click **Copy for GitHub** to copy a formatted Markdown table.
-
-### Option 2: Add Directly to this File
-Add a new row to the table above:
-```markdown
-| #6 | Your Feature Title | `Feature Request` | 💡 **Open** | Detailed description of what you would like to see. |
-```
-Then ask the AI agent to look at `FEATURE_TRACKER.md` and implement it!
 
 ---
 

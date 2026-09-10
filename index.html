@@ -22,10 +22,6 @@
       </div>
 
       <div class="top-actions">
-        <button id="tracker-btn" class="icon-btn tracker-btn" title="Issue & Feature Tracker">
-          <span class="tracker-icon">📋</span>
-          <span class="tracker-label">TRACKER</span>
-        </button>
         <button id="speed-btn" class="icon-btn" title="Toggle Game Speed">
           <span class="speed-badge" id="speed-indicator">1x</span>
         </button>
@@ -194,53 +190,6 @@
 
         <section class="modal-section dangerous-section">
           <button id="reset-game-btn" class="danger-btn">⚠️ Reset Game Progress</button>
-        </section>
-      </div>
-    </div>
-  </div>
-
-  <!-- Issue & Feature Tracker Modal -->
-  <div id="tracker-modal" class="modal-overlay hidden">
-    <div class="modal-content tracker-modal-content">
-      <div class="modal-header">
-        <div class="header-title-wrapper">
-          <h2>📋 GitHub Issue & Feature Tracker</h2>
-          <span class="tracker-subtitle">Log ideas, bugs, and balance requests for the AI to fix</span>
-        </div>
-        <button id="close-tracker-btn" class="close-btn">&times;</button>
-      </div>
-
-      <div class="modal-body">
-        <!-- New Issue Submission Form -->
-        <section class="modal-section new-issue-section">
-          <h3>SUBMIT NEW FEATURE / BUG</h3>
-          <form id="new-issue-form" class="issue-form">
-            <div class="form-row">
-              <input type="text" id="issue-title" class="form-input" placeholder="Title (e.g., Add prestige reset system)" required />
-              <select id="issue-type" class="form-select">
-                <option value="Feature Request">💡 Feature Request</option>
-                <option value="Bug Report">🐛 Bug Report</option>
-                <option value="Game Balance">⚖️ Game Balance</option>
-                <option value="Visual Polish">🎨 Visual Polish</option>
-              </select>
-            </div>
-            <textarea id="issue-desc" class="form-textarea" placeholder="Detailed description of your idea or what needs fixing..." rows="3" required></textarea>
-            <div class="form-actions">
-              <button type="submit" class="submit-issue-btn">➕ Submit to Tracker</button>
-              <button type="button" id="copy-issues-markdown-btn" class="secondary-btn">📋 Copy for GitHub</button>
-            </div>
-          </form>
-        </section>
-
-        <!-- Tracked Issues List -->
-        <section class="modal-section">
-          <div class="section-title-bar">
-            <h3>TRACKED ISSUES (<span id="issue-count">0</span>)</h3>
-            <span class="filter-hint">Stored locally & synced with FEATURE_TRACKER.md</span>
-          </div>
-          <div id="issues-list" class="issues-list">
-            <!-- Dynamically populated -->
-          </div>
         </section>
       </div>
     </div>

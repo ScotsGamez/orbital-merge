@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const balanceIcon = document.getElementById('balance-icon');
   const coinBalanceEl = document.getElementById('coin-balance');
   const cpsRateEl = document.getElementById('cps-rate');
-  const trackerBtn = document.getElementById('tracker-btn');
   const speedBtn = document.getElementById('speed-btn');
   const speedIndicator = document.getElementById('speed-indicator');
   const soundBtn = document.getElementById('sound-btn');
@@ -64,135 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeModalBtn = document.getElementById('close-modal-btn');
   const themeCards = document.querySelectorAll('.theme-card');
   const resetGameBtn = document.getElementById('reset-game-btn');
-
-  const trackerModal = document.getElementById('tracker-modal');
-  const closeTrackerBtn = document.getElementById('close-tracker-btn');
-  const newIssueForm = document.getElementById('new-issue-form');
-  const issueTitleInput = document.getElementById('issue-title');
-  const issueTypeSelect = document.getElementById('issue-type');
-  const issueDescText = document.getElementById('issue-desc');
-  const issuesListEl = document.getElementById('issues-list');
-  const issueCountEl = document.getElementById('issue-count');
-  const copyIssuesMarkdownBtn = document.getElementById('copy-issues-markdown-btn');
-
   const statLifetimeEl = document.getElementById('stat-lifetime');
   const statPassesEl = document.getElementById('stat-passes');
   const statMergesEl = document.getElementById('stat-merges');
   const statTierEl = document.getElementById('stat-tier');
-
-  // -------------------------------------------------------------
-  // ISSUE & FEATURE TRACKER STORE
-  // -------------------------------------------------------------
-  const DEFAULT_ISSUES = [
-    {
-      id: 1,
-      title: 'Rotate gates across orbital line',
-      type: 'Visual Polish',
-      status: 'Resolved',
-      desc: 'Rotated energy gates by 90° so they span radially across the track as authentic archways that ships fly through.'
-    },
-    {
-      id: 2,
-      title: 'Remove rocket emoji from center core',
-      type: 'Visual Polish',
-      status: 'Resolved',
-      desc: 'Replaced emoji with a high-tech sci-fi pulsating energy singularity with dual counter-rotating tech rings.'
-    },
-    {
-      id: 3,
-      title: 'Gate multiplier scaling: eliminate 1x',
-      type: 'Game Balance',
-      status: 'Resolved',
-      desc: 'Upgraded gate multipliers to start at 2x base and scale by powers of 2 (2x, 4x, 8x, 16x...) so payouts are mathematically meaningful.'
-    },
-    {
-      id: 4,
-      title: 'Gate merging and individual gate upgrading',
-      type: 'Feature Request',
-      status: 'Resolved',
-      desc: 'Added direct gate click inspection HUD for individual gate upgrades and a dedicated MERGE GATES button to combine identical gate tiers.'
-    },
-    {
-      id: 5,
-      title: 'Interactive GitHub Issue & Feature Tracker',
-      type: 'Feature Request',
-      status: 'Resolved',
-      desc: 'Built in-game tracker modal with localStorage persistence, Markdown copy for GitHub, and repository FEATURE_TRACKER.md board.'
-    },
-    {
-      id: 6,
-      title: 'Ship Level 1 starts with 1 coin economy and scaling',
-      type: 'Game Balance',
-      status: 'Resolved',
-      desc: 'Configured Level 1 ship to generate 1 coin per gate pass and cost 1 coin to buy, scaling smoothly for higher tiers and milestones.'
-    }
-  ];
-
-  let trackedIssues = [];
-  try {
-    const saved = localStorage.getItem('orbital_merge_issues');
-    if (saved) {
-      trackedIssues = JSON.parse(saved);
-    } else {
-      trackedIssues = DEFAULT_ISSUES;
-      localStorage.setItem('orbital_merge_issues', JSON.stringify(trackedIssues));
-    }
-  } catch (e) {
-    trackedIssues = DEFAULT_ISSUES;
-  }
-
-  function renderIssuesDOM() {
-    issuesListEl.innerHTML = '';
-    issueCountEl.textContent = trackedIssues.length;
-
-    trackedIssues.forEach(issue => {
-      const item = document.createElement('div');
-      item.className = 'issue-item';
-
-      const isResolved = issue.status === 'Resolved';
-      const statusClass = isResolved ? 'status-resolved' : 'status-open';
-      const statusIcon = isResolved ? '✅' : '💡';
-
-      item.innerHTML = `
-        <div class="issue-item-header">
-          <span class="issue-title-text">#${issue.id} ${escapeHtml(issue.title)}</span>
-          <div class="issue-tags">
-            <span class="tag-type">${escapeHtml(issue.type)}</span>
-            <span class="tag-status ${statusClass}">${statusIcon} ${escapeHtml(issue.status)}</span>
-          </div>
-        </div>
-        <p class="issue-desc-text">${escapeHtml(issue.desc)}</p>
-      `;
-      issuesListEl.appendChild(item);
-    });
-  }
-
-  function renderIssuesList() {
-    renderIssuesDOM();
-    // Fetch issues.json from server
-    fetch('/issues.json')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          // Merge server issues with any local write-ins
-          const localRaw = localStorage.getItem('orbital_merge_issues');
-          let localIssues = [];
-          if (localRaw) {
-            try { localIssues = JSON.parse(localRaw); } catch(e) {}
-          }
-          // Combine by ID
-          const existingIds = new Set(data.map(i => i.id));
-          const customIssues = localIssues.filter(i => !existingIds.has(i.id));
-          trackedIssues = [...customIssues, ...data];
-          renderIssuesDOM();
-        }
-      })
-      .catch(() => {});
-  }
-
-  function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
 
   // -------------------------------------------------------------
   // UI UPDATE METHODS
@@ -415,75 +289,10 @@ document.addEventListener('DOMContentLoaded', () => {
     storeModal.classList.add('hidden');
   });
 
-  trackerBtn.addEventListener('click', () => {
-    audio.playClick();
-    renderIssuesList();
-    trackerModal.classList.remove('hidden');
-  });
-
-  closeTrackerBtn.addEventListener('click', () => {
-    audio.playClick();
-    trackerModal.classList.add('hidden');
-  });
-
-  [storeModal, trackerModal].forEach(modal => {
-    modal.addEventListener('click', e => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
-      }
-    });
-  });
-
-  // Issue Form Submission
-  newIssueForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const title = issueTitleInput.value.trim();
-    const type = issueTypeSelect.value;
-    const desc = issueDescText.value.trim();
-
-    if (!title || !desc) return;
-
-    const newIssue = {
-      id: trackedIssues.length + 1,
-      title: title,
-      type: type,
-      status: 'Open',
-      desc: desc
-    };
-
-    // Post to server to sync with repository and FEATURE_TRACKER.md
-    fetch('/api/issues', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newIssue)
-    }).then(res => res.json())
-      .then(data => {
-        if (data && data.issue) {
-          renderIssuesList();
-        }
-      })
-      .catch(() => {});
-
-    renderIssuesDOM();
-    newIssueForm.reset();
-    audio.playBuy();
-    alert(`Issue #${newIssue.id} "${title}" logged successfully! The AI assistant can now review and resolve it.`);
-  });
-
-  // Copy Issues as Markdown for GitHub
-  copyIssuesMarkdownBtn.addEventListener('click', () => {
-    let md = '# 📋 Orbital Merge - Feature & Issue Tracker\n\n';
-    md += '| ID | Title | Type | Status | Description |\n';
-    md += '| :--- | :--- | :--- | :--- | :--- |\n';
-    trackedIssues.forEach(issue => {
-      md += `| #${issue.id} | **${issue.title}** | \`${issue.type}\` | ${issue.status === 'Resolved' ? '✅ Resolved' : '💡 Open'} | ${issue.desc} |\n`;
-    });
-
-    navigator.clipboard.writeText(md).then(() => {
-      alert('Markdown table copied to clipboard! You can paste this directly into GitHub Issues, PRs, or chat.');
-    }).catch(() => {
-      prompt('Copy your issues markdown below:', md);
-    });
+  storeModal.addEventListener('click', e => {
+    if (e.target === storeModal) {
+      storeModal.classList.add('hidden');
+    }
   });
 
   // Theme Switching
@@ -517,11 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!storeModal.classList.contains('hidden')) {
         updateStatsModal();
       }
-    } else if (e.key === 't' || e.key === 'T') {
-      trackerModal.classList.toggle('hidden');
-      if (!trackerModal.classList.contains('hidden')) {
-        renderIssuesList();
-      }
     }
   });
 
@@ -536,15 +340,10 @@ document.addEventListener('DOMContentLoaded', () => {
       updateStatsModal();
       storeModal.classList.remove('hidden');
     }
-    if (params.get('tracker') === '1' || params.get('tracker') === 'true') {
-      renderIssuesList();
-      trackerModal.classList.remove('hidden');
-    }
   } catch (e) {}
 
   // Initial Sync
   soundIcon.textContent = audio.muted ? '🔇' : '🔊';
-  renderIssuesList();
   updateThemeUI();
   updateGoalUI();
   updateBalanceUI();

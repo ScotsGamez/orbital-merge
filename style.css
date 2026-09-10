@@ -115,22 +115,6 @@ html, body {
   font-size: 1.1rem;
 }
 
-.tracker-btn {
-  padding: 0 12px;
-  gap: 6px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #fbbf24;
-  border-color: rgba(251, 191, 36, 0.3);
-  background: rgba(251, 191, 36, 0.1);
-}
-
-.tracker-btn:hover {
-  background: rgba(251, 191, 36, 0.2);
-  border-color: #fbbf24;
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
-}
-
 .icon-btn:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: var(--accent-cyan);
@@ -542,7 +526,7 @@ html, body {
 }
 
 /* -------------------------------------------------------------
-   MODALS (STORE & TRACKER)
+   MODALS (STORE)
    ------------------------------------------------------------- */
 .modal-overlay {
   position: fixed;
@@ -577,10 +561,6 @@ html, body {
   flex-direction: column;
 }
 
-.tracker-modal-content {
-  max-width: 680px;
-}
-
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -589,16 +569,9 @@ html, body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.header-title-wrapper h2 {
+.modal-header h2 {
   font-size: 1.25rem;
   font-weight: 800;
-}
-
-.tracker-subtitle {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  display: block;
-  margin-top: 2px;
 }
 
 .close-btn {
@@ -744,177 +717,6 @@ html, body {
 }
 
 /* -------------------------------------------------------------
-   TRACKER FORM & ISSUES LIST
-   ------------------------------------------------------------- */
-.issue-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.form-row {
-  display: flex;
-  gap: 10px;
-}
-
-.form-input, .form-select, .form-textarea {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  color: #fff;
-  padding: 8px 12px;
-  font-family: var(--font-main);
-  font-size: 0.85rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.form-input {
-  flex: 1;
-}
-
-.form-select {
-  width: 160px;
-  background-color: #0d1222;
-}
-
-.form-textarea {
-  width: 100%;
-  resize: vertical;
-  min-height: 60px;
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 8px var(--accent-glow);
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.submit-issue-btn {
-  background: linear-gradient(135deg, #057a44, #03522d);
-  border: 1px solid var(--accent-green);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.submit-issue-btn:hover {
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
-}
-
-.secondary-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.secondary-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: #fff;
-}
-
-.section-title-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.filter-hint {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-}
-
-.issues-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 280px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.issue-item {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.issue-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.issue-title-text {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.issue-tags {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.tag-status {
-  font-size: 0.65rem;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.status-resolved {
-  background: rgba(0, 255, 136, 0.18);
-  color: #00ff88;
-  border: 1px solid rgba(0, 255, 136, 0.4);
-}
-
-.status-open {
-  background: rgba(255, 215, 0, 0.18);
-  color: #ffd700;
-  border: 1px solid rgba(255, 215, 0, 0.4);
-}
-
-.tag-type {
-  font-size: 0.65rem;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-secondary);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.issue-desc-text {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.35;
-}
-
-/* -------------------------------------------------------------
    RESPONSIVE LAYOUT
    ------------------------------------------------------------- */
 @media (max-width: 768px) {
@@ -934,7 +736,7 @@ html, body {
   .top-bar {
     padding: 8px 10px;
   }
-  .tracker-label, .store-label {
+  .store-label {
     display: none;
   }
   .balance-amount {

@@ -4,6 +4,10 @@ A high-performance, dark-space orbital idle/merge game built with **HTML5 Canvas
 
 Inspired by circular track idle merge games and fully customizable across the **Multiverse** (Deep Space, Fantasy Realm, and Cyberpunk).
 
+- 🌐 **Live Demo (GitHub Pages)**: [https://scotsgamez.github.io/orbital-merge/](https://scotsgamez.github.io/orbital-merge/)
+- 💻 **GitHub Repository**: [https://github.com/ScotsGamez/orbital-merge](https://github.com/ScotsGamez/orbital-merge)
+- 🏠 **Local Network Access**: `http://192.168.0.21:8080`
+
 ---
 
 ## 🎮 Core Gameplay Loop
@@ -11,7 +15,7 @@ Inspired by circular track idle merge games and fully customizable across the **
 1. **Orbit & Generate**: Ships revolve clockwise along the central orbit at continuous angular velocity. Each time a ship passes through a gate, a payout is triggered:
    $$\text{Payout} = \text{Ship Tier Value} \times \text{Gate Tier Multiplier}$$
    *(Base Gate Multiplier starts at **2x** and scales by powers of 2: **2x, 4x, 8x, 16x, 32x, 64x**)*.
-2. **Buy & Scale**: Expand your fleet and gate network. Costs scale exponentially:
+2. **Buy & Scale**: Expand your fleet and gate network starting with 1-coin economy:
    $$\text{New Cost} = \text{Base Cost} \times 1.15^{\text{Owned Amount}}$$
 3. **Merge & Upgrade**:
    - **Merge Ships**: Combine two identical ships into Tier $N+1$ via the **MERGE SHIPS** button or canvas drag-and-drop.
@@ -21,12 +25,13 @@ Inspired by circular track idle merge games and fully customizable across the **
 
 ---
 
-## 📋 GitHub Issue & Feature Tracker
+## 📋 Issue & Feature Tracker (GitHub)
 
-The project includes both an in-game tracker and repository issue board:
-- Click the **📋 TRACKER** button in the top bar (or press `T`) to view open issues, submit new ideas or bug reports, and copy formatted GitHub markdown tables.
-- See [`FEATURE_TRACKER.md`](./FEATURE_TRACKER.md) for the active board and backlog.
-- GitHub issue templates are available in [`.github/ISSUE_TEMPLATE/`](./.github/ISSUE_TEMPLATE/).
+Submit new ideas, balance feedback, and bug reports directly on GitHub:
+
+- 💡 **[Submit Feature Request](https://github.com/ScotsGamez/orbital-merge/issues/new?template=feature_request.yml)** — Suggest new mechanics, visual themes, sound effects, or progression balance.
+- 🐛 **[Report a Bug](https://github.com/ScotsGamez/orbital-merge/issues/new?template=bug_report.yml)** — Report any glitches, calculation mismatches, or layout issues.
+- 📋 **[Roadmap & Change Log](FEATURE_TRACKER.md)** — View completed updates and upcoming backlog items.
 
 ---
 
@@ -54,7 +59,6 @@ Switch themes seamlessly in real-time from the **Store (🌌)** menu:
   - `G`: Buy +1 Gate
   - `M`: Merge lowest matching ship pair
   - `S`: Open / Close Multiverse Store & Stats modal
-  - `T`: Open / Close Issue & Feature Tracker
 
 ---
 
@@ -70,7 +74,11 @@ Switch themes seamlessly in real-time from the **Store (🌌)** menu:
   ├── style.css             # Modern dark neon theme & animations
   ├── script.js             # Controller binding DOM, audio, renderer & engine
   ├── FEATURE_TRACKER.md    # Central project issue and idea tracker
-  ├── .github/              # GitHub issue templates
+  ├── .github/
+  │   └── ISSUE_TEMPLATE/   # Interactive GitHub Issue Forms (YAML)
+  │       ├── feature_request.yml
+  │       ├── bug_report.yml
+  │       └── config.yml
   ├── src/
   │   ├── themes.js         # Central Multiverse theme definitions
   │   ├── audio.js          # Web Audio API sound synthesis
@@ -84,24 +92,11 @@ Switch themes seamlessly in real-time from the **Store (🌌)** menu:
 
 ## 🚀 Local Setup & Running
 
-Open `index.html` directly in any modern web browser, or serve with a local HTTP server:
+Serve with a local HTTP server:
 
 ```bash
-# Using Python
-python3 -m http.server 8080
-
-# Using Node (npx)
-npx serve .
+# Using Python (accessible to local network)
+python3 -m http.server 8080 --bind 0.0.0.0
 ```
 
-Then visit `http://localhost:8080` in your browser.
-
----
-
-## 📦 GitHub Push Instructions
-
-```bash
-git add .
-git commit -m "Enhance gates: radial orientation, 2x base multiplier, gate merge/upgrade system, remove center emoji, add feature tracker"
-git push
-```
+Then visit `http://localhost:8080` (or `http://192.168.0.21:8080` from phones/tablets on your WiFi).

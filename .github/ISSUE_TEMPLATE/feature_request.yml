@@ -1,0 +1,55 @@
+name: "💡 Feature Request"
+description: "Propose a new idea, mechanic, upgrade, or visual enhancement"
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing ideas to **Orbital Merge**! Fill out this form and the AI assistant will review, prioritize, and implement your request.
+  - type: input
+    id: feature-title
+    attributes:
+      label: Feature Title
+      description: A concise summary of the feature or idea.
+      placeholder: "e.g., Add Prestige / Singularity Reset System"
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What part of the game does this affect?
+      options:
+        - "Core Gameplay (Ships, Gates, Merging)"
+        - "Economy & Progression (Coin generation, Costs, Milestones)"
+        - "Visuals & Themes (Canvas graphics, HUD, Animations)"
+        - "Audio & SFX (Music, Sound FX, Synthesizer)"
+        - "Controls & Usability (Keyboard shortcuts, Mobile layout, LAN)"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Describe in detail what you would like added or changed.
+      placeholder: "Describe the mechanic, how it works, how players interact with it, and why it makes the game better..."
+    validations:
+      required: true
+  - type: textarea
+    id: gameplay-impact
+    attributes:
+      label: Gameplay & Balance Impact
+      description: How should this scale or affect game progression?
+      placeholder: "e.g., Unlocks after Tier 5, costs 1,000 coins, multiplies speed by 1.5x..."
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Additional Checklist
+      options:
+        - label: "This idea fits the idle/merge orbital loop"
+          required: false
+        - label: "Ready for immediate AI implementation"
+          required: false
