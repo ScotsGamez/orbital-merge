@@ -1,35 +1,40 @@
-# 📋 Orbital Merge - Issue & Feature Tracker
+# 📋 Orbital Merge - GitHub Issue & Feature Tracker
 
-This document serves as the project's central roadmap and idea backlog. All issues and feature requests are tracked directly on GitHub using native GitHub Issue Forms.
+GitHub is the single source of truth for all issue tracking, bug reports, and feature proposals for **Orbital Merge**.
 
----
-
-## 🔗 Submit an Issue on GitHub
-
-To request a new feature or report a bug, use the interactive GitHub Issue forms:
-
-- 💡 **[Submit Feature Request](https://github.com/ScotsGamez/orbital-merge/issues/new?template=feature_request.yml)** — Propose new game mechanics, balance changes, visual themes, or sound effects.
-- 🐛 **[Report a Bug](https://github.com/ScotsGamez/orbital-merge/issues/new?template=bug_report.yml)** — Report gameplay glitches, calculation errors, or display anomalies.
-- 📋 **[View All GitHub Issues](https://github.com/ScotsGamez/orbital-merge/issues)** — Browse open and closed issues.
+- 💡 **[Submit a Feature Request](https://github.com/ScotsGamez/orbital-merge/issues/new?template=feature_request.yml)**
+- 🐛 **[Report a Bug](https://github.com/ScotsGamez/orbital-merge/issues/new?template=bug_report.yml)**
+- 📋 **[View All Issues on GitHub](https://github.com/ScotsGamez/orbital-merge/issues)**
 
 ---
 
-## 🚀 Resolved Features & Change Log
+## 🎯 Active & Open Feature Requests (GitHub)
 
-| ID | Title | Type | Status | Description |
+| Issue | Title | Category | Status | GitHub Link |
 | :--- | :--- | :--- | :--- | :--- |
-| **#1** | **Rotate gates across orbital line** | `Visual Polish` | ✅ **Resolved** | Rotated energy gates by 90° so they span radially across the track as authentic archways that ships fly through. |
-| **#2** | **Remove rocket emoji from center core** | `Visual Polish` | ✅ **Resolved** | Replaced emoji with a high-tech sci-fi pulsating energy singularity with dual counter-rotating tech rings. |
-| **#3** | **Gate multiplier scaling: eliminate 1x** | `Game Balance` | ✅ **Resolved** | Upgraded gate multipliers to start at 2x base and scale by powers of 2 (2x, 4x, 8x, 16x...) so payouts are mathematically meaningful. |
-| **#4** | **Gate merging and individual gate upgrading** | `Feature Request` | ✅ **Resolved** | Added direct gate click inspection HUD for individual gate upgrades and a dedicated `MERGE GATES` button to combine identical gate tiers. |
-| **#5** | **GitHub Issue & Feature Tracking** | `Feature Request` | ✅ **Resolved** | Configured structured GitHub Issue Forms (`.github/ISSUE_TEMPLATE/`) for direct 1-click submission on GitHub. |
-| **#6** | **Ship Level 1 starts with 1 coin economy & scaling** | `Game Balance` | ✅ **Resolved** | Configured Level 1 ship base payout to 1 coin and base cost to 1 coin, with smooth exponential pacing for tiers, gates, and missions. |
+| **#7** | **Prestige / Quantum Reset system** | `Gameplay & Progression` | 💡 **Open** | [#7 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/7) |
+| **#8** | **Orbital Superchargers (booster nodes)** | `Active Clicker` | 💡 **Open** | [#8 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/8) |
+| **#9** | **Ambient soundtrack & synth audio toggle** | `Audio & Music` | 💡 **Open** | [#9 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/9) |
+| **#10** | **Specialized gate types (Gravity Wells, Prism)** | `Core Gameplay` | 💡 **Open** | [#10 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/10) |
 
 ---
 
-## 🎯 Proposed Future Ideas Backlog
+## ✅ Completed & Resolved Issues (GitHub)
 
-- [ ] **Prestige / Quantum Reset**: Reset fleet for permanent orbital boost multiplier and cosmic relics.
-- [ ] **Orbital Superchargers**: Clickable booster nodes that temporarily accelerate orbit velocity for 10 seconds.
-- [ ] **Soundtrack Music**: Background ambient synthwave/celestial soundscapes toggle.
-- [ ] **Gate Specializations**: Special gate types (e.g. Gravity Wells that accelerate ships, Double-payout prisms).
+| Issue | Title | Category | Status | GitHub Link |
+| :--- | :--- | :--- | :--- | :--- |
+| **#1** | **Rotate gates across orbital line** | `Visual Polish` | ✅ **Closed** | [#1 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/1) |
+| **#2** | **Remove rocket emoji from center core** | `Visual Polish` | ✅ **Closed** | [#2 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/2) |
+| **#3** | **Gate multiplier scaling: eliminate 1x base** | `Game Balance` | ✅ **Closed** | [#3 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/3) |
+| **#4** | **Gate merging and individual gate upgrading** | `Feature Request` | ✅ **Closed** | [#4 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/4) |
+| **#5** | **Configure native GitHub Issue Forms** | `Feature Request` | ✅ **Closed** | [#5 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/5) |
+| **#6** | **Ship Level 1 starts with 1 coin economy & scaling** | `Game Balance` | ✅ **Closed** | [#6 on GitHub](https://github.com/ScotsGamez/orbital-merge/issues/6) |
+
+---
+
+## 🤖 AI Workflow for Issue Tracking
+
+Whenever you ask the AI to check, summarize, or work on issues:
+1. The assistant pulls active issues directly via `gh issue list --repo ScotsGamez/orbital-merge`.
+2. Inspects specifications and user input directly from the GitHub issue.
+3. Implements the feature or bugfix, tests it, commits the code, and links/closes the issue on GitHub.
